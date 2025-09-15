@@ -17,8 +17,8 @@ Describe the problem solved and/or what the project is doing
 Team details follow
 
 ### 495 Students 
-
-495 student name here
+Austin Thorton
+AnTonia Kelly
 
 ### 394 Students
 
