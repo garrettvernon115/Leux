@@ -18,6 +18,7 @@ Team details follow
 
 ### 495 Students 
 Austin Thorton
+
 AnTonia Kelly
 
 ### 394 Students
