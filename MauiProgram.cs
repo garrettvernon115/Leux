@@ -1,6 +1,7 @@
 ﻿using Firebase.Auth;
 using Firebase.Auth.Providers;
-using Leux.Resources.Pages.Firestore.Example;
+using Leux.Resources.Firestore;
+using Leux.Resources.Firestore.Example;
 using Microsoft.Extensions.Logging;
 
 namespace Leux;

@@ -2,6 +2,7 @@
 using Google.Cloud.Firestore;
 using Grpc.Auth;
 using Grpc.Core;
+using Leux.Resources.Firestore;
 using Leux.Resources.Models;
 using System;
 using System.Collections.Generic;
@@ -10,62 +11,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Leux.Resources.Pages.Firestore.Example
+namespace Leux.Resources.Firestore.Example
 {
     public class FirestoreServiceCounter : IFireStoreServiceCounter
     {
-        private FirestoreDb _db;
+        
         private const string CollectionName = "app_data";
         private const string DocumentID = "counter";
-        private const string ProjectId = "leux-ed1c0";
         private bool _isInitialized = false;
 
         public bool IsInitialized => _isInitialized;
-
-        public async Task<bool> InitializeAsync()
-        {
-            try
-            {
-                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "credentials.json");
-
-                if (!File.Exists(path))
-                {
-                    throw new FileNotFoundException($"Credentials file not found at: {path}");
-                }
-
-                Debug.WriteLine("Credentials file found!");
-                GoogleCredential credential = GoogleCredential.FromFile(path);
-                ChannelCredentials channelCredentials = credential.ToChannelCredentials();
-
-                FirestoreDbBuilder builder = new FirestoreDbBuilder
-                {
-                    ProjectId = ProjectId,
-                    ChannelCredentials = channelCredentials
-                };
-
-                _db = builder.Build();
-                _isInitialized = true;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Firestore initialization error: {ex.Message}");
-                _isInitialized = false;
-                throw;
-            }
-        }
 
         public async Task<CounterData> GetCounterAsync()
         {
             try
             {
-                if (!_isInitialized)
+                if (!FirestoreDatabase.IsInitialized)
                 {
                     Debug.WriteLine("Firestore not initialized");
                     return new CounterData();
                 }
 
-                DocumentReference docRef = _db.Collection(CollectionName).Document(DocumentID);
+                DocumentReference docRef = FirestoreDatabase.Database.Collection(CollectionName).Document(DocumentID);
                 DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
 
                 if (snapshot.Exists)
@@ -91,15 +58,15 @@ namespace Leux.Resources.Pages.Firestore.Example
         {
             try
             {
-                if (!_isInitialized)
+                if (!FirestoreDatabase.IsInitialized)
                 {
                     Debug.WriteLine("Firestore not initialized");
                     return false;
                 }
 
-                DocumentReference docRef = _db.Collection(CollectionName).Document(DocumentID);
+                DocumentReference docRef = FirestoreDatabase.Database.Collection(CollectionName).Document(DocumentID);
 
-                await _db.RunTransactionAsync(async transaction =>
+                await FirestoreDatabase.Database.RunTransactionAsync(async transaction =>
                 {
                     DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(docRef);
                     int currentCount = 0;
@@ -127,15 +94,15 @@ namespace Leux.Resources.Pages.Firestore.Example
         {
             try
             {
-                if (!_isInitialized && !await InitializeAsync())
+                if (!FirestoreDatabase.IsInitialized)
                 {
                     Debug.WriteLine("Firestore not initialized");
                     return false;
                 }
 
-                DocumentReference docRef = _db.Collection(CollectionName).Document(DocumentID);
+                DocumentReference docRef = FirestoreDatabase.Database.Collection(CollectionName).Document(DocumentID);
 
-                await _db.RunTransactionAsync(async transaction =>
+                await FirestoreDatabase.Database.RunTransactionAsync(async transaction =>
                 {
                     DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(docRef);
 

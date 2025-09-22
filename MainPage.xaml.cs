@@ -1,5 +1,5 @@
-﻿using Leux.Resources.Models;
-using Leux.Resources.Pages.Firestore.Example;
+﻿using Leux.Resources.Firestore.Example;
+using Leux.Resources.Models;
 
 namespace Leux;
 

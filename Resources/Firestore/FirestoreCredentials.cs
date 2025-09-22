@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Leux.Resources.Firestore
+{
+    public static class FirestoreCredentials
+    {
+        public static readonly string Credentials = 
+        @"{
+            ""type"": ""service_account"",
+            ""project_id"": ""leux-ed1c0"",
+            ""private_key_id"": ""46b4a2c88209bb90b346843b45ec1c886a81e883"",
+            ""private_key"": ""-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCfz43SVMWbsHRV\nrABACvOKkdeqWy3s+QX1RD+g/NEhDJSpG8cPf9EEgb5zjHpY3NVuDxGpPD8ZsPVx\nDIMjshCPqfTVjM2Qpp//raIZzWF+GEAkcTt5kMdTzCukMvzRGFErbcWgUED7y/E9\nf2XNyjUNNf3VKoMwAJLwiloQ0lm4Awe+BhoowcoD3ugao4zCQ7Wxr3gLc7nCm5im\nXQ/PZ35tKB90HXa7inclkdU6sWXtuFRBev44ZB4FWoQielCUrtdk3Cd53yYgetIi\nfLpRvSf8jltHaY9X50qpQPsYYnwx1iadbAdNHOzcS1izuxOWMU9+bkK35OqcaLbi\nboJU/T0HAgMBAAECggEAPMx00zFHIK0oBTPzwGmqL+y+VORte3teBeqaHoAwe9dS\nc2fK+p2RAprtvv4Ryd7yH/YBrRXrl7WYGxM8jQcAf/eT2u6/gimyM052nkRhs9w8\nAuFFVEF9Y+cIL2bqgg4zS0du6Ue/AUyckd32+CzWtBj3YfLTiB6fyH2KOF4enf+H\nDTgIHTZpxfOY+4GzBJ0qId9mQN8rZR9WDfyEPcgGpd9zLJzu4O5zCDRwGhZ33Ku5\nizxomDnORWxHtpow786p5zKcBcsnFjXL+R2ID7QxjylVwaw+EtGJ5fteMwrjHTE4\n7LpJ3zSM9XLhR2JrFWkHud1At8nT3OuRWkINkBnJ2QKBgQDULYM42laYG253WDo1\niTS1s84h/xbEVzpg/0aVF3PftspiwmPudbr5Pe1Utj7w3eAoeD85QYN5AYBpjSO9\nMVFHYVJ9epB1w1XIQBf8CfpVglzRjmouEzNIOId2WVs5yPbjC6yFRRQEEveISkGa\njDVTSAxeboFy/FlbBSStmyZwMwKBgQDA0TygV1s4Bg6knpynAi/mUpJOReM+qjg/\niOp9sW3Ubty3CUO1H2LXYSoB5Ji27TTAQ9lBGjbV1bGeHIgUhdEtgjkvW6GPLO37\neDuEc4TAmRGrH2/FUx9rwllE24UTcfnYaGNplFDHvt3P9SBIyy/gNsh1UJ8daDso\nQvvnACMb3QKBgFaA47HnGkzTSjsv5jNzZ+D4mH61wDN2GJ/5E26vbBd2L5cKB7Ht\nn7gD7mGOF6Ud4Ei/lY8jTZWk7hSabUqx86A1Zmsv7/uDEtMchmrEKqJ4Dp2FAXcd\nbtfv7BJtJcsuSrGQTdrbqehrTy3qkEqRBSCaDCjnxrD5fvij5Ss+SPKPAoGAIQx8\nCLuQXgTjw6GQFiwQy7iBbTsbXSVN6M3t60dbHNs3p4PGACh2B5aW3aYx6sCzlvTK\nKxd0KKis/f3D8UiSdutoI87f3SuFSuHryaMHMP/LgHot7TN3IkA4js3VfGS/vzD9\nQR5zzhjP6hIIy5FQDm01ZK5B54dzBE6e4JQscF0CgYEAm58fdXCl/nfK4SEn1AGa\ndFKr8zLd7zzFoY1/yRMdObQfZ7afSwQkqXAD8lTNMSvv328wSFx5vA4loMIOB3zg\nH2/qnyQZwKhg4GapbYYZSLNGOiLr9KuppZcbsNb4qTdQo4uqfPaRkQu7kpz8MPV6\nG2umIOkxHqKlE1jfCIgYOfE=\n-----END PRIVATE KEY-----\n"",
+            ""client_email"": ""firebase-adminsdk-fbsvc@leux-ed1c0.iam.gserviceaccount.com"",
+            ""client_id"": ""104588780129545624837"",
+            ""auth_uri"": ""https://accounts.google.com/o/oauth2/auth"",
+            ""token_uri"": ""https://oauth2.googleapis.com/token"",
+            ""auth_provider_x509_cert_url"": ""https://www.googleapis.com/oauth2/v1/certs"",
+            ""client_x509_cert_url"": ""https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40leux-ed1c0.iam.gserviceaccount.com"",
+            ""universe_domain"": ""googleapis.com""
+        }";
+    }
+}
