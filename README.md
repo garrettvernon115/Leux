@@ -1,16 +1,16 @@
-# Your Team Name Here
+# Team 9
 
-This is the team repository for <your team name here>
+This is the team repository for Team 9
 
 ## Project
 
 Project details follow. 
 
 ### Project Name
-Your Project Name goes here
+Luex
 
 ### Project Description  
-Describe the problem solved and/or what the project is doing
+An application for desktop and android that helps with impulse spending
 
 ## Team
 
@@ -18,7 +18,6 @@ Team details follow
 
 ### 495 Students 
 Austin Thorton
-
 AnTonia Kelly
 
 ### 394 Students
