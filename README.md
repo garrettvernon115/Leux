@@ -30,10 +30,14 @@ AnTonia Kelly
 
 ## Prerequisites
 
-List tech stack (including version if possible) on both backend and frondend (Database).
+Frontend: .NET MAUI XAML
+Backend: C#
+Database: Firebase Firestore
 
 ## Set Up and Installation
 
 Details on how to set up the project follow.
 
-<put the details here>
+```
+.git clone <repo url>
+```
