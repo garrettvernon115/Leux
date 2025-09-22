@@ -40,4 +40,5 @@ Details on how to set up the project follow.
 
 ```
 .git clone <repo url>
+Run the .sln file in MS Studio 2022
 ```
