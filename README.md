@@ -35,7 +35,9 @@ Brady Stocker
 ## Prerequisites
 
 Frontend: .NET MAUI XAML
+
 Backend: C#
+
 Database: Firebase Firestore
 
 ## Set Up and Installation
