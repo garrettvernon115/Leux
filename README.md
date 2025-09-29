@@ -18,15 +18,19 @@ Team details follow
 
 ### 495 Students 
 Austin Thorton
+
 AnTonia Kelly
 
 ### 394 Students
+Garrett Vernon
 
-394 Student(s) here
+Shayne Galloway
+
 
 ### 294 Students
+Brady Stocker
 
-294 Student(s) here
+ Nouri Ouetta 
 
 ## Prerequisites
 
