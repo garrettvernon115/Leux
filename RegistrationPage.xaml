@@ -4,9 +4,50 @@
              x:Class="Leux.RegistrationPage"
              Title="RegistrationPage">
     <VerticalStackLayout Padding="20" Spacing="15">
+        <!-- Header-->
         <Label 
             Text="User Registration"
             FontSize="24" 
+            HorizontalOptions="Center"
+            FontAttributes="Bold"/>
+        
+        <!-- Name -->
+        <VerticalStackLayout>
+            <Label Text="Full Name" FontAttributes="Bold" />
+            <Entry x:Name="nameEntered" Placeholder="Enter Your Full Name" />
+        </VerticalStackLayout>
+        
+        <!-- Email -->
+        <VerticalStackLayout>
+            <Label Text="Email" FontAttributes="Bold" />
+            <Entry x:Name="emailEntered" Placeholder="Enter Your Email" Keyboard="Email" />
+
+        </VerticalStackLayout>
+
+        <!-- Password -->
+        <VerticalStackLayout>
+            <Label Text="Password" FontAttributes="Bold" />
+            <Entry x:Name="passwordEntered" Placeholder="Enter Your Password" IsPassword="True" />
+        </VerticalStackLayout>
+
+        <!-- Confirm Password -->
+        <VerticalStackLayout>
+            <Label Text="Confirm Password" FontAttributes="Bold" />
+            <Entry x:Name="confirmPasswordEntered" Placeholder="Re-enter Your Password" IsPassword="True" />
+        </VerticalStackLayout>
+
+        <!-- Register Button -->
+        <Button 
+            Text="Register" 
+            BackgroundColor="Blue" 
+            TextColor="White" 
+            Clicked="OnRegisterButtonClicked"/>
+        
+        <!--Status Message-->
+        <Label 
+            x:Name="statusMessage"
+            Text=""
+            TextColor="Red"
             HorizontalOptions="Center" />
     </VerticalStackLayout>
 </ContentPage>
