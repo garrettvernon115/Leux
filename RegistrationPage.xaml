@@ -2,52 +2,84 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Leux.RegistrationPage"
-             Title="RegistrationPage">
-    <VerticalStackLayout Padding="20" Spacing="15">
-        <!-- Header-->
-        <Label 
-            Text="User Registration"
-            FontSize="24" 
-            HorizontalOptions="Center"
-            FontAttributes="Bold"/>
-        
-        <!-- Name -->
-        <VerticalStackLayout>
-            <Label Text="Full Name" FontAttributes="Bold" />
-            <Entry x:Name="nameEntered" Placeholder="Enter Your Full Name" />
-        </VerticalStackLayout>
-        
-        <!-- Email -->
-        <VerticalStackLayout>
-            <Label Text="Email" FontAttributes="Bold" />
-            <Entry x:Name="emailEntered" Placeholder="Enter Your Email" Keyboard="Email" />
+             Title="Registration">
+    <!-- Center everything in middle of screen -->
+    <Grid RowDefinitions="*,Auto,*" Padding="24">
+        <Frame Grid.Row="1"
+               Padding="24"
+               HasShadow="False"
+               CornerRadius="12"
+               HorizontalOptions="Center"
+               MaximumWidthRequest="480"
+               WidthRequest="420"
+               BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E1E1E'}">
+            <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
+                <!-- Logo or main image -->
+                <Image Source="dotnet_bot.png"
+                       HeightRequest="120"
+                       Aspect="AspectFit"
+                       HorizontalOptions="Center" />
 
-        </VerticalStackLayout>
+                <!-- Title -->
+                <Label Text="Create Account"
+                       FontSize="24"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
 
-        <!-- Password -->
-        <VerticalStackLayout>
-            <Label Text="Password" FontAttributes="Bold" />
-            <Entry x:Name="passwordEntered" Placeholder="Enter Your Password" IsPassword="True" />
-        </VerticalStackLayout>
+                <!-- Full Name Entry -->
+                <Entry x:Name="nameEntered"
+                       Placeholder="Full Name"
+                       WidthRequest="320"
+                       MaximumWidthRequest="400"
+                       HorizontalOptions="Center" />
 
-        <!-- Confirm Password -->
-        <VerticalStackLayout>
-            <Label Text="Confirm Password" FontAttributes="Bold" />
-            <Entry x:Name="confirmPasswordEntered" Placeholder="Re-enter Your Password" IsPassword="True" />
-        </VerticalStackLayout>
+                <!-- Email Entry -->
+                <Entry x:Name="emailEntered"
+                       Placeholder="Email"
+                       Keyboard="Email"
+                       WidthRequest="320"
+                       MaximumWidthRequest="400"
+                       HorizontalOptions="Center" />
 
-        <!-- Register Button -->
-        <Button 
-            Text="Register" 
-            BackgroundColor="Blue" 
-            TextColor="White" 
-            Clicked="OnRegisterButtonClicked"/>
-        
-        <!--Status Message-->
-        <Label 
-            x:Name="statusMessage"
-            Text=""
-            TextColor="Red"
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+                <!-- Password Entry -->
+                <Entry x:Name="passwordEntered"
+                       Placeholder="Password"
+                       IsPassword="True"
+                       WidthRequest="320"
+                       MaximumWidthRequest="400"
+                       HorizontalOptions="Center" />
+
+                <!-- Confirm Password Entry -->
+                <Entry x:Name="confirmPasswordEntered"
+                       Placeholder="Confirm Password"
+                       IsPassword="True"
+                       WidthRequest="320"
+                       MaximumWidthRequest="400"
+                       HorizontalOptions="Center" />
+
+                <!-- Register Button -->
+                <Button Text="Register"
+                        Clicked="RegisterUser"
+                        CornerRadius="10"
+                        HeightRequest="44"
+                        WidthRequest="320"
+                        MaximumWidthRequest="400"
+                        HorizontalOptions="Center" />
+
+                <!-- Status Message -->
+                <Label x:Name="statusMessage"
+                       Text=""
+                       TextColor="Red"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+
+                <!-- Back to Login Button -->
+                <Button Text="Already have an account? Login"
+                        Clicked="NavigateLoginPage"
+                        BackgroundColor="Transparent"
+                        TextColor="{AppThemeBinding Light='#5A5A5A', Dark='#BEBEBE'}"
+                        HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Frame>
+    </Grid>
 </ContentPage>

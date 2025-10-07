@@ -15,11 +15,27 @@ public partial class LoginPage : ContentPage
         await DisplayAlert("Login Attempt",
             $"Email: {email}\nPassword: {password}", "OK");
 
-        
+        if (!IsEmailValid(email) || !IsValidRegister(email, password))
+        {
+            // email or password issue
+        }
+
+        // register user
+
     }
 
     private async void OnSignUpClicked(object sender, EventArgs e)
     {
-        await DisplayAlert("Sign Up", "Navigate to Sign Up page (coming soon)", "OK");
+        await Navigation.PushAsync(new RegistrationPage());
+    }
+
+    private bool IsEmailValid(string email)
+    {
+        return false;
+    }
+
+    private bool IsValidRegister(string email, string password)
+    {
+        return false;
     }
 }
