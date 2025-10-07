@@ -1,0 +1,67 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Leux.LoginPage"
+             Title="Login">
+
+    <!-- Center everything in middle of screen -->
+    <Grid RowDefinitions="*,Auto,*" Padding="24">
+
+        <Frame Grid.Row="1"
+           Padding="24"
+           HasShadow="False"
+           CornerRadius="12"
+           HorizontalOptions="Center"
+           MaximumWidthRequest="480"
+           WidthRequest="420"
+           BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E1E1E'}">
+
+            <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
+
+                <!-- Logo or main image -->
+                <Image Source="dotnet_bot.png"
+               HeightRequest="120"
+               Aspect="AspectFit"
+               HorizontalOptions="Center" />
+
+                <!-- Title -->
+                <Label Text="Welcome Back!"
+               FontSize="24"
+               HorizontalOptions="Center"
+               HorizontalTextAlignment="Center" />
+
+                <!-- Email Entry -->
+                <Entry x:Name="EmailEntry"
+               Placeholder="Email"
+               Keyboard="Email"
+               WidthRequest="320"
+               MaximumWidthRequest="400"
+               HorizontalOptions="Center" />
+
+                <!-- Password Entry -->
+                <Entry x:Name="PasswordEntry"
+               Placeholder="Password"
+               IsPassword="True"
+               WidthRequest="320"
+               MaximumWidthRequest="400"
+               HorizontalOptions="Center" />
+
+                <!-- Login Button -->
+                <Button Text="Login"
+                Clicked="OnLoginClicked"
+                CornerRadius="10"
+                HeightRequest="44"
+                WidthRequest="320"
+                MaximumWidthRequest="400"
+                HorizontalOptions="Center" />
+
+                <!-- Sign Up Button -->
+                <Button Text="Sign Up"
+                Clicked="OnSignUpClicked"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light='#5A5A5A', Dark='#BEBEBE'}"
+                HorizontalOptions="Center" />
+
+            </VerticalStackLayout>
+        </Frame>
+    </Grid>
+</ContentPage>
