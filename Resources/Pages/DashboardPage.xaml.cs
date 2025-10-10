@@ -1,4 +1,6 @@
-namespace Leux.Resources.Pages;
+using System.Diagnostics;
+
+namespace Leux;
 
 public partial class DashboardPage : ContentPage
 {
