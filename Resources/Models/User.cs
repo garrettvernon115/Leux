@@ -1,6 +1,6 @@
 ﻿using Google.Cloud.Firestore;
 
-namespace Leux.Models
+namespace Leux.Resources.Models
 {
     [FirestoreData]
     public class User
@@ -18,4 +18,3 @@ namespace Leux.Models
         public string Username { get; set; }
     }
 }
-
