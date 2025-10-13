@@ -60,6 +60,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Firestore\leux-ed1c0-firebase-adminsdk-fbsvc-46b4a2c882.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiAsset Include="Resources\Firestore\leux-ed1c0-firebase-adminsdk-fbsvc-46b4a2c882.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
 		<PackageReference Include="Google.Cloud.Firestore" Version="3.10.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
