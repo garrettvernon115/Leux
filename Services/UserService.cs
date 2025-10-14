@@ -9,7 +9,6 @@ namespace Leux.Services
     public class UserService : IUserService
     {
         private readonly FirebaseAuthClient _authClient;
-        private readonly FirestoreDb _firestoreDb = FirestoreDatabase.Database;
 
         public UserService(FirebaseAuthClient authClient)
         {
@@ -29,10 +28,9 @@ namespace Leux.Services
                     Email = email,
                     Username = username
                 };
-                
-                CollectionReference usersCollection = _firestoreDb.Collection("users");
-                await usersCollection.Document(userId).SetAsync(user);
 
+                CollectionReference usersCollection = FirestoreDatabase.Database.Collection("users");
+                await usersCollection.Document(userId).SetAsync(user);
                 return true;
             }
             catch (FirebaseAuthException)
@@ -55,4 +53,3 @@ namespace Leux.Services
         }
     }
 }
-

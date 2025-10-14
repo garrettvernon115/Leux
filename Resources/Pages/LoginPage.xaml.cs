@@ -1,10 +1,16 @@
-﻿namespace Leux;
+﻿using Leux.Services;
+using System.Text.RegularExpressions;
+
+namespace Leux;
 
 public partial class LoginPage : ContentPage
 {
+    private readonly IUserService _userService;
+
     public LoginPage()
     {
         InitializeComponent();
+        _userService = Application.Current.MainPage.Handler.MauiContext.Services.GetService<IUserService>();
     }
 
     private async void OnLoginClicked(object sender, EventArgs e)
@@ -12,16 +18,25 @@ public partial class LoginPage : ContentPage
         string email = EmailEntry.Text;
         string password = PasswordEntry.Text;
 
-        await DisplayAlert("Login Attempt",
-            $"Email: {email}\nPassword: {password}", "OK");
-
-        if (!IsEmailValid(email) || !IsValidRegister(email, password))
+        // Validate input
+        if (!IsValidLogin(email, password))
         {
-            // email or password issue
+            return;
         }
 
-        // register user
+        // Attempt login
+        bool success = await _userService.LoginUserAsync(email, password);
 
+        if (success)
+        {
+            await DisplayAlert("Success", "Login successful!", "OK");
+            // Navigate to main page/app shell
+            Application.Current.MainPage = new AppShell();
+        }
+        else
+        {
+            await DisplayAlert("Login Failed", "Invalid email or password. Please try again.", "OK");
+        }
     }
 
     private async void OnSignUpClicked(object sender, EventArgs e)
@@ -31,11 +46,32 @@ public partial class LoginPage : ContentPage
 
     private bool IsEmailValid(string email)
     {
-        return false;
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+
+        return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
     }
 
-    private bool IsValidRegister(string email, string password)
+    private bool IsValidLogin(string email, string password)
     {
-        return false;
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            DisplayAlert("Validation Error", "Please fill in all fields.", "OK");
+            return false;
+        }
+
+        if (!IsEmailValid(email))
+        {
+            DisplayAlert("Validation Error", "Please enter a valid email address.", "OK");
+            return false;
+        }
+
+        if (password.Length < 6)
+        {
+            DisplayAlert("Validation Error", "Password must be at least 6 characters long.", "OK");
+            return false;
+        }
+
+        return true;
     }
 }
