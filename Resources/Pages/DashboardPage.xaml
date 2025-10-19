@@ -7,7 +7,7 @@
         <VerticalStackLayout BackgroundColor="White" Padding="20" Spacing="20">
 
             <Grid RowDefinitions="*,*"  ColumnDefinitions="*,*,*" ColumnSpacing="20" RowSpacing="25" HorizontalOptions="FillAndExpand">
-                
+
                 <!-- Today's Spending -->
                 <Frame Grid.Column="0" BackgroundColor="MediumPurple" CornerRadius="10" Padding="10" HeightRequest="100">
                     <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
@@ -31,16 +31,17 @@
                         <Label Text="$1,123.45" FontSize="14" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                 </Frame>
-                
+
 
             </Grid>
-                <!-- Quick Add Expenses -->
+            <!-- Quick Add Expenses -->
             <Frame BackgroundColor="LightGrey"  CornerRadius="10" Padding="10">
                 <VerticalStackLayout Spacing="10">
                     <Label TextColor="Black" Text="Quick Add Expenses" FontSize="20" FontAttributes="Bold" />
                     <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
-                        <Entry Grid.Column="0" TextColor="Black" Placeholder="Description" />
-                        <Entry Grid.Column="1" TextColor="Black" Placeholder="Amount" Keyboard="Numeric" />
+                        <!-- ADDED: x:Name attributes to identify the input fields -->
+                        <Entry x:Name="DescriptionEntry" Grid.Column="0" TextColor="Black" Placeholder="Description" />
+                        <Entry x:Name="AmountEntry" Grid.Column="1" TextColor="Black" Placeholder="Amount" Keyboard="Numeric" />
                         <Picker Grid.Column="2" TitleColor="Black" TextColor="Black" x:Name="CategoryPicker" Title="Category">
                             <Picker.Items>
                                 <x:String>Food &amp; Drink</x:String>
@@ -49,28 +50,29 @@
                                 <x:String>Entertainment</x:String>
                             </Picker.Items>
                         </Picker>
-                        <Button Grid.Column="3" Text="Add" BackgroundColor="Green" TextColor="White" />
+                        <!-- ADDED: Clicked event to trigger our backend code -->
+                        <Button Grid.Column="3" Text="Add" BackgroundColor="Green" TextColor="White" Clicked="OnAddExpenseClicked" />
 
                     </Grid>
-                        
+
                 </VerticalStackLayout>
             </Frame>
-            
+
             <!-- Today's Expenses -->
             <Label TextColor="Black" Text="Today's Expenses" FontSize="20" FontAttributes="Bold" />
-            
+
 
 
 
 
         </VerticalStackLayout>
-        
-     
-    </ScrollView>       
-    
-    
-    
-    
-    
-    
+
+
+    </ScrollView>
+
+
+
+
+
 </ContentPage>
+
