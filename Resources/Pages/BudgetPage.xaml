@@ -3,16 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Leux.BudgetPage"
              Title="Budget Management">
-
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
-
-            <Label Text="Add Budget" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center" />
-
-            <Entry x:Name="categoryInput" Placeholder="Category" />
-            <Entry x:Name="limitInput" Placeholder="Limit ($)" Keyboard="Numeric" />
-            <Entry x:Name="spentInput" Placeholder="Spent ($)" Keyboard="Numeric" />
-        </VerticalStackLayout>
-    </ScrollView>
+    <Grid>
+        <StackLayout Padding="20" Spacing="15">
+            <Label Text="Budget Management" FontSize="24" HorizontalOptions="Start" />
+            <Button Text="Add Budget" Clicked="OnAddBudgetClicked" />
+        </StackLayout>
+        
+        <!-- Popup Overlay-->
+        <ContentView x:Name="PopupOverlay" IsVisible="False"
+                     BackgroundColor="#80000000"
+                     VerticalOptions="FillAndExpand"
+                     HorizontalOptions="FillAndExpand">
+            <Frame BackgroundColor="White"
+                   Padding="20"
+                   CornerRadius="10"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"
+                   WidthRequest="300">
+                <StackLayout Spacing="15">
+                    <Label Text="New Budget" FontSize="20" HorizontalOptions="Center" TextColor="Black"/>
+                    <Entry x:Name="BudgetNameEntry" Placeholder="Budget Name" TextColor="Black" />
+                    <Entry x:Name="BudgetAmountEntry" Placeholder="Amount" Keyboard="Numeric" TextColor="Black" />
+                    <DatePicker x:Name="BudgetDatePicker" TextColor="Black" />
+                    <Button Text="Save" Clicked="OnSaveBudgetClicked" />
+                    <Button Text="Cancel" Clicked="OnCancelClicked" />
+                </StackLayout>
+            </Frame>
+        </ContentView>
+    </Grid>
 
 </ContentPage>
