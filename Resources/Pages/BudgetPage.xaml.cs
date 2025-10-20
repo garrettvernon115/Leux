@@ -11,6 +11,15 @@ public partial class BudgetPage : ContentPage
 
     private void OnAddBudgetClicked(object sender, EventArgs e)
     {
+        string name = BudgetNameEntry.Text;
+        string amountText = BudgetAmountEntry.Text;
+        DateTime date = BudgetDatePicker.Date;
+
+        BudgetNameLabel.Text = $"Name: {name}";
+        BudgetAmountLabel.Text = $"Amount: {amountText}";
+        BudgetDateLabel.Text = $"Date: {date:MMMM dd, yyyy}";
+
+        BudgetDisplayFrame.IsVisible = true;
         PopupOverlay.IsVisible = true;
     }
 

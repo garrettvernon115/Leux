@@ -4,9 +4,21 @@
              x:Class="Leux.BudgetPage"
              Title="Budget Management">
     <Grid>
-        <StackLayout Padding="20" Spacing="15">
-            <Label Text="Budget Management" FontSize="24" HorizontalOptions="Start" />
-            <Button Text="Add Budget" Clicked="OnAddBudgetClicked" />
+        <StackLayout Padding="20" Spacing="15" BackgroundColor="White">
+            <Label Text="Budget Management" FontSize="24" HorizontalOptions="Start" VerticalOptions="Start" TextColor="Black" />
+            <Button Text="Add Budget" Clicked="OnAddBudgetClicked" VerticalOptions="Start" HorizontalOptions="End" BackgroundColor="LimeGreen" />
+            <Frame x:Name="BudgetDisplayFrame"
+                   IsVisible="False"
+                   BorderColor="Gray"
+                   CornerRadius="8"
+                   Padding="15"
+                   BackgroundColor="DarkGray">
+                <StackLayout>
+                    <Label x:Name="BudgetNameLabel" Text="Name: " FontSize="16" TextColor="Black" />
+                    <Label x:Name="BudgetAmountLabel" Text="Amount: " FontSize="16" TextColor="Black" />
+                    <Label x:Name="BudgetDateLabel" Text="Date: " FontSize="16" TextColor="Black" />
+                </StackLayout>
+            </Frame>
         </StackLayout>
         
         <!-- Popup Overlay-->
