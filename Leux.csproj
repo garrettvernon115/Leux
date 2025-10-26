@@ -74,6 +74,13 @@
 	  <MauiAsset Update="Resources\Raw\leux-ed1c0-firebase-adminsdk-fbsvc-46b4a2c882.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </MauiAsset>
+	  <Compile Update="Resources\Pages\BudgetPage.xaml.cs">
+	    <DependentUpon>BudgetPage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
-
+	<ItemGroup>
+	  <MauiXaml Update="Resources\Pages\BudgetPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
 </Project>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Leux.BudgetPage"
+             Title="Budget Management">
+    <Grid>
+        <StackLayout Padding="20" Spacing="15" BackgroundColor="White">
+            <Label Text="Budget Management" FontSize="24" HorizontalOptions="Start" VerticalOptions="Start" TextColor="Black" />
+            <Button Text="Add Budget" Clicked="OnAddBudgetClicked" VerticalOptions="Start" HorizontalOptions="End" BackgroundColor="LimeGreen" />
+            <Frame x:Name="BudgetDisplayFrame"
+                   IsVisible="False"
+                   BorderColor="Gray"
+                   CornerRadius="8"
+                   Padding="15"
+                   BackgroundColor="DarkGray">
+                <StackLayout>
+                    <Label x:Name="BudgetNameLabel" Text="Name: " FontSize="16" TextColor="Black" />
+                    <Label x:Name="BudgetAmountLabel" Text="Amount: " FontSize="16" TextColor="Black" />
+                    <Label x:Name="BudgetDateLabel" Text="Date: " FontSize="16" TextColor="Black" />
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+        
+        <!-- Popup Overlay-->
+        <ContentView x:Name="PopupOverlay" IsVisible="False"
+                     BackgroundColor="#80000000"
+                     VerticalOptions="FillAndExpand"
+                     HorizontalOptions="FillAndExpand">
+            <Frame BackgroundColor="White"
+                   Padding="20"
+                   CornerRadius="10"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"
+                   WidthRequest="300">
+                <StackLayout Spacing="15">
+                    <Label Text="New Budget" FontSize="20" HorizontalOptions="Center" TextColor="Black"/>
+                    <Entry x:Name="BudgetNameEntry" Placeholder="Budget Name" TextColor="Black" />
+                    <Entry x:Name="BudgetAmountEntry" Placeholder="Amount" Keyboard="Numeric" TextColor="Black" />
+                    <DatePicker x:Name="BudgetDatePicker" TextColor="Black" />
+                    <Button Text="Save" Clicked="OnSaveBudgetClicked" />
+                    <Button Text="Cancel" Clicked="OnCancelClicked" />
+                </StackLayout>
+            </Frame>
+        </ContentView>
+    </Grid>
+
+</ContentPage>
