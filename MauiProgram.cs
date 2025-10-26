@@ -47,6 +47,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IUserService, UserService>();
 
         builder.Services.AddSingleton<IFireStoreServiceCounter, FirestoreServiceCounter>();
+        builder.Services.AddSingleton<IDashboardService, DashboardService>();
         builder.Services.AddSingleton<MainPage>();
         builder.Services.AddSingleton<LoginPage>();
         builder.Services.AddSingleton<RegistrationPage>();
