@@ -10,6 +10,8 @@ namespace Leux.Services
     {
         private readonly FirebaseAuthClient _authClient;
 
+        public FirebaseAuthClient AuthClient => _authClient;
+
         public UserService(FirebaseAuthClient authClient)
         {
             _authClient = authClient;

@@ -1,4 +1,5 @@
-﻿using Leux.Services;
+﻿using Leux.Resources.Firestore;
+using Leux.Services;
 using System.Text.RegularExpressions;
 
 namespace Leux;
@@ -30,8 +31,7 @@ public partial class LoginPage : ContentPage
         if (success)
         {
             await DisplayAlert("Success", "Login successful!", "OK");
-            // Navigate to main page/app shell
-            Application.Current.MainPage = new AppShell();
+            await Shell.Current.GoToAsync($"{nameof(DashboardPage)}");
         }
         else
         {
