@@ -7,12 +7,13 @@ namespace Leux;
 public partial class RegistrationPage : ContentPage
 {
     private readonly IUserService _userService;
+    private readonly INavigationService _navigationService;
 
-    public RegistrationPage()
+    public RegistrationPage(IUserService userService, INavigationService navigationService)
     {
         InitializeComponent();
-
-        _userService = Application.Current.MainPage.Handler.MauiContext.Services.GetService<IUserService>();
+        _userService = userService;
+        _navigationService = navigationService;
     }
 
     private async void RegisterUser(object sender, EventArgs e)
@@ -32,7 +33,7 @@ public partial class RegistrationPage : ContentPage
         if (success)
         {
             await DisplayAlert("Success", "Your account has been created!", "OK");
-            await Navigation.PushAsync(new LoginPage());
+            await _navigationService.NavigateToLoginAsync();
         }
         else
         {
@@ -80,7 +81,7 @@ public partial class RegistrationPage : ContentPage
 
     private async void NavigateLoginPage(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new LoginPage());
+        await _navigationService.NavigateToLoginAsync();
     }
 }
 

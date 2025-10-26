@@ -7,11 +7,13 @@ namespace Leux;
 public partial class LoginPage : ContentPage
 {
     private readonly IUserService _userService;
+    private readonly INavigationService _navigationService;
 
-    public LoginPage()
+    public LoginPage(IUserService userService, INavigationService navigationService)
     {
         InitializeComponent();
-        _userService = Application.Current.MainPage.Handler.MauiContext.Services.GetService<IUserService>();
+        _userService = userService;
+        _navigationService = navigationService;
     }
 
     private async void OnLoginClicked(object sender, EventArgs e)
@@ -41,7 +43,7 @@ public partial class LoginPage : ContentPage
 
     private async void OnSignUpClicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new RegistrationPage());
+        await _navigationService.NavigateToRegistrationAsync();
     }
 
     private bool IsEmailValid(string email)

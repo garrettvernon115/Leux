@@ -1,11 +1,19 @@
+using Firebase.Auth;
+using Leux.Services;
+
 namespace Leux;
 
 public partial class ProfilePage : ContentPage
 {
-    public ProfilePage()
+    private readonly INavigationService _navigationService;
+    private readonly FirebaseAuthClient _authClient;
+
+    public ProfilePage(INavigationService navigationService, FirebaseAuthClient authClient)
     {
         InitializeComponent();
-        CurrencyPicker.SelectedIndex = 0; 
+        _navigationService = navigationService;
+        _authClient = authClient;
+        CurrencyPicker.SelectedIndex = 0;
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
@@ -18,8 +26,16 @@ public partial class ProfilePage : ContentPage
         await DisplayAlert("Profile", "Change Password (UI only)", "OK");
     }
 
-    private void OnSignOut(object sender, EventArgs e)
+    private async void OnSignOut(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new LoginPage();
+        try
+        {
+            _authClient.SignOut();
+            await _navigationService.NavigateToLoginAsync();
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Failed to sign out: {ex.Message}", "OK");
+        }
     }
 }

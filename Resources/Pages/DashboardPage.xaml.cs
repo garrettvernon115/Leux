@@ -9,12 +9,14 @@ namespace Leux
     {
         private readonly IDashboardService _dashboardService;
         private readonly FirebaseAuthClient _authClient;
+        private readonly INavigationService _navigationService;
 
-        public DashboardPage(IDashboardService dashboardService, FirebaseAuthClient authClient)
+        public DashboardPage(IDashboardService dashboardService,FirebaseAuthClient authClient, INavigationService navigationService)
         {
             InitializeComponent();
             _dashboardService = dashboardService;
             _authClient = authClient;
+            _navigationService = navigationService;
         }
 
         private async void OnAddExpenseClicked(object sender, EventArgs e)

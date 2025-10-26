@@ -61,13 +61,15 @@ public static class MauiProgram
         builder.Services.AddSingleton<IUserService, UserService>();
         builder.Services.AddSingleton<IFireStoreServiceCounter, FirestoreServiceCounter>();
         builder.Services.AddSingleton<IDashboardService, DashboardService>();
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<DashboardPage>();
         builder.Services.AddTransient<RegistrationPage>();
-
         builder.Services.AddSingleton<AppShell>();
+        builder.Services.AddSingleton<ProfilePage>();
+        builder.Services.AddSingleton<ReportPage>();
 
         return builder.Build();
     }
