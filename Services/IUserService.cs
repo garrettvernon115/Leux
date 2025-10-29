@@ -6,6 +6,7 @@ namespace Leux.Services
     {
         Task<bool> RegisterUserAsync(string username, string email, string password);
         Task<bool> LoginUserAsync(string email, string password);
+        Task<bool> ChangePasswordAsync(string newPassword);
     }
 }
 
