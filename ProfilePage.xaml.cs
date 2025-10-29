@@ -1,17 +1,19 @@
+using Firebase.Auth;
 using Leux.Services;
 
 namespace Leux;
 
 public partial class ProfilePage : ContentPage
 {
-    private readonly IUserService _userService;
+    private readonly INavigationService _navigationService;
+    private readonly FirebaseAuthClient _authClient;
 
-    public ProfilePage()
+    public ProfilePage(INavigationService navigationService, FirebaseAuthClient authClient)
     {
         InitializeComponent();
+        _navigationService = navigationService;
+        _authClient = authClient;
         CurrencyPicker.SelectedIndex = 0;
-
-        _userService = Application.Current.MainPage.Handler.MauiContext.Services.GetService<IUserService>();
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
@@ -60,8 +62,16 @@ public partial class ProfilePage : ContentPage
         }
     }
 
-    private void OnSignOut(object sender, EventArgs e)
+    private async void OnSignOut(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new LoginPage();
+        try
+        {
+            _authClient.SignOut();
+            await _navigationService.NavigateToLoginAsync();
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Failed to sign out: {ex.Message}", "OK");
+        }
     }
 }

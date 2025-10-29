@@ -31,29 +31,46 @@ public static class MauiProgram
             Providers = new[] { new EmailProvider() }
         }));
 
-
         string projectId = "leux-ed1c0";
-        builder.Services.AddSingleton(provider =>
-        {
-            var stream = FileSystem.OpenAppPackageFileAsync("leux-ed1c0-firebase-adminsdk-fbsvc-46b4a2c882.json").Result;
-            string json;
-            using (var reader = new StreamReader(stream))
-            {
-                json = reader.ReadToEnd();
-            }
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", json);
-            return FirestoreDb.Create(projectId);
-        });
-        builder.Services.AddSingleton<IUserService, UserService>();
 
+        builder.Services.AddSingleton<FirestoreDb>(provider =>
+        {
+            try
+            {
+                var stream = FileSystem.OpenAppPackageFileAsync("leux-ed1c0-firebase-adminsdk-fbsvc-46b4a2c882.json")
+                    .GetAwaiter().GetResult();
+
+                string json;
+                using (var reader = new StreamReader(stream))
+                {
+                    json = reader.ReadToEnd();
+                }
+
+                var tempPath = Path.Combine(FileSystem.CacheDirectory, "firebase-credentials.json");
+                File.WriteAllText(tempPath, json);
+                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", tempPath);
+
+                return FirestoreDb.Create(projectId);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to initialize FirestoreDb: {ex.Message}", ex);
+            }
+        });
+
+        builder.Services.AddSingleton<IUserService, UserService>();
         builder.Services.AddSingleton<IFireStoreServiceCounter, FirestoreServiceCounter>();
         builder.Services.AddSingleton<IDashboardService, DashboardService>();
-        builder.Services.AddSingleton<MainPage>();
-        builder.Services.AddSingleton<LoginPage>();
-        builder.Services.AddSingleton<RegistrationPage>();
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
+
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddTransient<DashboardPage>();
+        builder.Services.AddTransient<RegistrationPage>();
         builder.Services.AddSingleton<AppShell>();
+        builder.Services.AddSingleton<ProfilePage>();
+        builder.Services.AddSingleton<ReportPage>();
 
         return builder.Build();
     }
 }
-
