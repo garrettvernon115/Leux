@@ -53,5 +53,24 @@ namespace Leux.Services
                 return false;
             }
         }
+
+        // New Implementation for changing the password
+        public async Task<bool> ChangePasswordAsync(string newPassword)
+        {         
+            if (_authClient.User == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                await _authClient.User.ChangePasswordAsync(newPassword);
+                return true;
+            }
+            catch (FirebaseAuthException)
+            {
+                return false;
+            }
+        }
     }
 }
