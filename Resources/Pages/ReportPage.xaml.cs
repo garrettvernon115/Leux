@@ -1,114 +1,63 @@
-﻿namespace Leux;
+﻿using Firebase.Auth;
+using Leux.Resources.Models;
+using Leux.Services;
+using System.Diagnostics;
+
+namespace Leux;
 
 public partial class ReportPage : ContentPage
 {
-    public ReportPage()
+    private readonly IReportService _reportService;
+    private readonly FirebaseAuthClient _authClient;
+
+    public ReportPage(FirebaseAuthClient authClient)
     {
         InitializeComponent();
-        LoadDemo();
-        BuildCategoryBreakdown();
+        // LoadUserReport();
     }
 
-    void LoadDemo()
+    private async void LoadUserReport()
+    {
+        Debug.WriteLine($"Loading User Report");
+        try
+        {
+            string currentUserId = _authClient?.User?.Uid;
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                await DisplayAlert("Not Logged In", "You must be logged in to view your report.", "OK");
+                return;
+            }
+
+            var report = await _reportService.GetReportDataAsync(currentUserId);
+
+            if (report == null)
+            {
+                await DisplayAlert("Error", "Failed to load report data.", "OK");
+                return;
+            }
+
+            LoadReport(report);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error loading report: {ex.Message}");
+            await DisplayAlert("Error", "An error occurred while loading the report.", "OK");
+        }
+    }
+
+    private void LoadReport(ReportData report)
     {
         // Weekly
-        WeeklyTitle.Text = "Weekly Report (Sep 15–21, 2025)";
-        WeeklySpent.Text = "$234.56";
-        WeeklyTx.Text = "12";
-        WeeklyAvg.Text = "$33.51";
-        WeeklyTopCat.Text = "Food & Drink";
-
+        WeeklyTitle.Text = report.WeeklyTitle;
+        WeeklySpent.Text = $"${report.WeeklySpent:F2}";
+        WeeklyTx.Text = report.WeeklyTx.ToString();
+        WeeklyAvg.Text = $"${report.WeeklyAvg:F2}";
+        WeeklyTopCat.Text = report.WeeklyTopCat;
         // Monthly
-        MonthlyTitle.Text = "Monthly Report (September 2025)";
-        MonthlySpent.Text = "$1,123.45";
-        MonthlyTx.Text = "45";
-        MonthlyAvg.Text = "$53.50";
-        MonthlyBudgetUsed.Text = "75%";
-    }
-
-    void BuildCategoryBreakdown()
-    {
-        // Category data
-        var cats = new (string Name, double Amount)[]
-        {
-            ("Food & Drink", 345.67),
-            ("Shopping",     278.90),
-            ("Entertainment",189.45),
-            ("Transport",     89.23),
-        };
-
-        // Category color palette
-        Color GetColor(string name) => name switch
-        {
-            "Food & Drink" => Color.FromArgb("#6A5ACD"), // purple
-            "Shopping" => Color.FromArgb("#4CAF50"), // green
-            "Entertainment" => Color.FromArgb("#2196F3"), // blue
-            "Transport" => Color.FromArgb("#FF9800"), // orange
-            _ => Color.FromArgb("#9E9E9E"),
-        };
-
-        CategoryStack.Children.Clear();
-
-        double max = cats.Max(c => c.Amount);
-
-        foreach (var c in cats)
-        {
-            double pct = max > 0 ? c.Amount / max : 0;
-
-            // 3 columns: Category | Bar | Amount
-            var row = new Grid
-            {
-                ColumnDefinitions =
-                {
-                    new ColumnDefinition(GridLength.Auto),
-                    new ColumnDefinition(GridLength.Star),
-                    new ColumnDefinition(GridLength.Auto)
-                },
-                ColumnSpacing = 12,
-                Padding = new Thickness(0, 2)
-            };
-
-            // Category name
-            row.Add(new Label
-            {
-                Text = c.Name,
-                VerticalTextAlignment = TextAlignment.Center
-            }, 0, 0);
-
-            // Replace CornerRadius (Grid can't use it) → Frame for rounded look
-            var track = new Frame
-            {
-                HeightRequest = 10,
-                BackgroundColor = new Color(1f, 1f, 1f, 0.12f),
-                VerticalOptions = LayoutOptions.Center,
-                CornerRadius = 5,
-                Padding = 0,
-                HasShadow = false
-            };
-
-            // Bar fill (ProgressBar with proper float Progress)
-            var bar = new ProgressBar
-            {
-                Progress = (float)Math.Clamp(pct, 0, 1), // 👈 cast to float
-                HeightRequest = 10,
-                VerticalOptions = LayoutOptions.Center,
-#if ANDROID || WINDOWS || MACCATALYST || IOS
-                ProgressColor = GetColor(c.Name)
-#endif
-            };
-
-            track.Content = bar;
-            row.Add(track, 1, 0);
-
-            // Amount (right)
-            row.Add(new Label
-            {
-                Text = $"${c.Amount:F2}",
-                VerticalTextAlignment = TextAlignment.Center,
-                HorizontalTextAlignment = TextAlignment.End
-            }, 2, 0);
-
-            CategoryStack.Children.Add(row);
-        }
+        MonthlyTitle.Text = report.MonthlyTitle;
+        MonthlySpent.Text = $"${report.MonthlySpent:F2}";
+        MonthlyTx.Text = report.MonthlyTx.ToString();
+        MonthlyAvg.Text = $"${report.MonthlyAvg:F2}";
+        MonthlyBudgetUsed.Text = report.MonthlyBudgetUsed;
     }
 }

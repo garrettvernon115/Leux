@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Leux.Resources.Pages.NavigationHeader">
+
+    <Frame Padding="0" 
+           CornerRadius="0" 
+           HasShadow="True"
+           BackgroundColor="{AppThemeBinding Light='#F7F7FB', Dark='#1E1E1E'}">
+        <HorizontalStackLayout Spacing="0" 
+                              Padding="20,10"
+                              HorizontalOptions="Center">
+
+            <Button Text="Budget" 
+                    Clicked="OnBudgetClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light='#333333', Dark='#FFFFFF'}"
+                    FontSize="16"
+                    Padding="15,10"
+                    CornerRadius="8"
+                    Margin="5,0" />
+
+            <Button Text="Dashboard" 
+                    Clicked="OnDashboardClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light='#333333', Dark='#FFFFFF'}"
+                    FontSize="16"
+                    Padding="15,10"
+                    CornerRadius="8"
+                    Margin="5,0" />
+
+            <Button Text="Expenses" 
+                    Clicked="OnExpensesClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light='#333333', Dark='#FFFFFF'}"
+                    FontSize="16"
+                    Padding="15,10"
+                    CornerRadius="8"
+                    Margin="5,0" />
+
+            <Button Text="Profile" 
+                    Clicked="OnProfileClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light='#333333', Dark='#FFFFFF'}"
+                    FontSize="16"
+                    Padding="15,10"
+                    CornerRadius="8"
+                    Margin="5,0" />
+
+            <Button Text="Reports" 
+                    Clicked="OnReportsClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light='#333333', Dark='#FFFFFF'}"
+                    FontSize="16"
+                    Padding="15,10"
+                    CornerRadius="8"
+                    Margin="5,0" />
+
+        </HorizontalStackLayout>
+    </Frame>
+
+</ContentView>

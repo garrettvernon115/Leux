@@ -10,59 +10,78 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(DashboardPage), typeof(DashboardPage));
         Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
         Routing.RegisterRoute(nameof(ReportPage), typeof(ReportPage));
+        Routing.RegisterRoute(nameof(BudgetPage), typeof(BudgetPage));
     }
 
     public void SwitchToMainApp()
     {
         Items.Clear();
 
-        var tabBar = new TabBar
+        // Create a TabBar for the main authenticated section
+        var mainTabBar = new TabBar
         {
             Route = "MainApp"
         };
 
-        var dashboardTab = new Tab
+        // Budget Tab
+        var budgetTab = new ShellContent
+        {
+            Title = "Budget",
+            Route = "BudgetPage",
+            ContentTemplate = new DataTemplate(typeof(BudgetPage))
+        };
+        Shell.SetNavBarIsVisible(budgetTab, false);
+
+        // Dashboard Tab
+        var dashboardTab = new ShellContent
         {
             Title = "Dashboard",
-            Icon = "dashboard_icon.png",
-            Route = "DashboardTab"
-        };
-        dashboardTab.Items.Add(new ShellContent
-        {
             Route = "DashboardPage",
             ContentTemplate = new DataTemplate(typeof(DashboardPage))
-        });
-        tabBar.Items.Add(dashboardTab);
-
-        var mainTab = new Tab
-        {
-            Title = "Home",
-            Icon = "home_icon.png",
-            Route = "MainTab"
         };
-        mainTab.Items.Add(new ShellContent
-        {
-            Route = "MainPage",
-            ContentTemplate = new DataTemplate(typeof(MainPage))
-        });
-        tabBar.Items.Add(mainTab);
+        Shell.SetNavBarIsVisible(dashboardTab, false);
 
-        var profileTab = new Tab
+        // Expenses Tab
+        /**
+        var expensesTab = new ShellContent
+        {
+            Title = "Expenses",
+            Route = "ExpensesPage",
+            ContentTemplate = new DataTemplate(typeof(ExpensesPage))
+        };
+        Shell.SetNavBarIsVisible(expensesTab, false);
+        **/
+
+        // Profile Tab
+        var profileTab = new ShellContent
         {
             Title = "Profile",
-            Icon = "profile_icon.png",
-            Route = "ProfileTab"
-        };
-        profileTab.Items.Add(new ShellContent
-        {
             Route = "ProfilePage",
             ContentTemplate = new DataTemplate(typeof(ProfilePage))
-        });
-        tabBar.Items.Add(profileTab);
+        };
+        Shell.SetNavBarIsVisible(profileTab, false);
 
-        Items.Add(tabBar);
+        // Reports Tab
+        var reportsTab = new ShellContent
+        {
+            Title = "Reports",
+            Route = "ReportPage",
+            ContentTemplate = new DataTemplate(typeof(ReportPage))
+        };
+        Shell.SetNavBarIsVisible(reportsTab, false);
 
-        CurrentItem = tabBar;
+        // Add all tabs to the TabBar
+        mainTabBar.Items.Add(budgetTab);
+        mainTabBar.Items.Add(dashboardTab);
+        // mainTabBar.Items.Add(expensesTab);
+        mainTabBar.Items.Add(profileTab);
+        mainTabBar.Items.Add(reportsTab);
+
+        Items.Add(mainTabBar);
+        CurrentItem = mainTabBar;
+
+        // Navigate to Dashboard by default
+        Shell.Current.GoToAsync("//MainApp/DashboardPage");
     }
 
     public void SwitchToLogin()
@@ -74,7 +93,6 @@ public partial class AppShell : Shell
             Route = "Login",
             ContentTemplate = new DataTemplate(typeof(LoginPage))
         };
-
         Shell.SetNavBarIsVisible(loginContent, false);
 
         Items.Add(loginContent);

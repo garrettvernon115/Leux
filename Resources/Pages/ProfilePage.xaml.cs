@@ -7,12 +7,14 @@ public partial class ProfilePage : ContentPage
 {
     private readonly INavigationService _navigationService;
     private readonly FirebaseAuthClient _authClient;
+    private readonly IUserService _userService;
 
-    public ProfilePage(INavigationService navigationService, FirebaseAuthClient authClient)
+    public ProfilePage(INavigationService navigationService, FirebaseAuthClient authClient, IUserService userService)
     {
         InitializeComponent();
         _navigationService = navigationService;
         _authClient = authClient;
+        _userService = userService;
         CurrencyPicker.SelectedIndex = 0;
     }
 

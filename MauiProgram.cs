@@ -4,6 +4,7 @@ using Google.Cloud.Firestore;
 using Leux.Services;
 using Leux.Resources.Firestore.Example;
 using Microsoft.Extensions.Logging;
+using Leux.Resources.Models;
 
 namespace Leux;
 
@@ -63,13 +64,17 @@ public static class MauiProgram
         builder.Services.AddSingleton<IDashboardService, DashboardService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
 
+        // builder.Services.AddSingleton<IReportService, ReportService>(); TODO ReportService
+
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<DashboardPage>();
         builder.Services.AddTransient<RegistrationPage>();
-        builder.Services.AddSingleton<AppShell>();
         builder.Services.AddSingleton<ProfilePage>();
         builder.Services.AddSingleton<ReportPage>();
+        builder.Services.AddSingleton<BudgetPage>();
+
+        builder.Services.AddSingleton<AppShell>();
 
         return builder.Build();
     }
