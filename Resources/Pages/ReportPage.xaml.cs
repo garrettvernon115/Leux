@@ -2,18 +2,22 @@
 using Leux.Resources.Models;
 using Leux.Services;
 using System.Diagnostics;
-
+using Google.Cloud.Firestore;
 namespace Leux;
 
 public partial class ReportPage : ContentPage
 {
     private readonly IReportService _reportService;
     private readonly FirebaseAuthClient _authClient;
+    private readonly INavigationService _navigationService;
 
-    public ReportPage(FirebaseAuthClient authClient)
+    public ReportPage(IReportService reportService,FirebaseAuthClient authClient, INavigationService navigationService)
     {
         InitializeComponent();
-        // LoadUserReport();
+        _reportService = reportService;
+        _authClient = authClient;
+        _navigationService = navigationService;
+
     }
 
     private async void LoadUserReport()
@@ -40,8 +44,8 @@ public partial class ReportPage : ContentPage
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error loading report: {ex.Message}");
             await DisplayAlert("Error", "An error occurred while loading the report.", "OK");
+            Debug.WriteLine($"Error loading report: {ex.Message}");
         }
     }
 
