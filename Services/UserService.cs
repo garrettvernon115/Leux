@@ -10,6 +10,8 @@ namespace Leux.Services
     {
         private readonly FirebaseAuthClient _authClient;
 
+        public FirebaseAuthClient AuthClient => _authClient;
+
         public UserService(FirebaseAuthClient authClient)
         {
             _authClient = authClient;
@@ -44,6 +46,25 @@ namespace Leux.Services
             try
             {
                 await _authClient.SignInWithEmailAndPasswordAsync(email, password);
+                return true;
+            }
+            catch (FirebaseAuthException)
+            {
+                return false;
+            }
+        }
+
+        // New Implementation for changing the password
+        public async Task<bool> ChangePasswordAsync(string newPassword)
+        {         
+            if (_authClient.User == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                await _authClient.User.ChangePasswordAsync(newPassword);
                 return true;
             }
             catch (FirebaseAuthException)

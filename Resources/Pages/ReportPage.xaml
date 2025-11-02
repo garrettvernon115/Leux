@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Leux.Resources.Pages"
+             x:Class="Leux.ReportPage"
+             Title="Spending Reports"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Navigation Header -->
+        <local:NavigationHeader Grid.Row="0" />
+
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1">
+            <Grid RowDefinitions="*,Auto,*" Padding="24">
+                <Frame Grid.Row="1"
+                       Padding="24"
+                       CornerRadius="14"
+                       HasShadow="False"
+                       HorizontalOptions="Center"
+                       WidthRequest="900"
+                       MaximumWidthRequest="1000"
+                       BackgroundColor="{AppThemeBinding Light='#F7F7FB', Dark='#121212'}">
+
+                    <ScrollView>
+                        <VerticalStackLayout Spacing="16">
+
+                            <Label Text="Spending Reports"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   Margin="6,0" />
+
+                            <!-- ===== Weekly Card ===== -->
+                            <Frame Padding="18" CornerRadius="14" HasShadow="False"
+                                   BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E1E1E'}">
+                                <VerticalStackLayout Spacing="12">
+                                    <Label x:Name="WeeklyTitle"
+                                           Text="Weekly Report (Sep 15–21, 2025)"
+                                           FontAttributes="Bold" />
+                                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="16">
+                                        <VerticalStackLayout>
+                                            <Label Text="Total Spent" Opacity="0.7"/>
+                                            <Label x:Name="WeeklySpent" Text="$0.00" FontAttributes="Bold" FontSize="22"/>
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                                            <Label Text="Transactions" Opacity="0.7"/>
+                                            <Label x:Name="WeeklyTx" Text="0" FontAttributes="Bold" FontSize="22"/>
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="2" HorizontalOptions="End">
+                                            <Label Text="Avg/Day" Opacity="0.7"/>
+                                            <Label x:Name="WeeklyAvg" Text="$0.00" FontAttributes="Bold" FontSize="22"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,6,0,0">
+                                        <Label Text="Top Category" Opacity="0.7"/>
+                                        <Label x:Name="WeeklyTopCat" Grid.Column="1" Text="—" FontAttributes="Bold"/>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Frame>
+
+                            <!-- ===== Monthly Card ===== -->
+                            <Frame Padding="18" CornerRadius="14" HasShadow="False"
+                                   BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E1E1E'}">
+                                <VerticalStackLayout Spacing="12">
+                                    <Label x:Name="MonthlyTitle"
+                                           Text="Monthly Report (September 2025)"
+                                           FontAttributes="Bold" />
+                                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="16">
+                                        <VerticalStackLayout>
+                                            <Label Text="Total Spent" Opacity="0.7"/>
+                                            <Label x:Name="MonthlySpent" Text="$0.00" FontAttributes="Bold" FontSize="22"/>
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                                            <Label Text="Transactions" Opacity="0.7"/>
+                                            <Label x:Name="MonthlyTx" Text="0" FontAttributes="Bold" FontSize="22"/>
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="2" HorizontalOptions="End">
+                                            <Label Text="Avg/Day" Opacity="0.7"/>
+                                            <Label x:Name="MonthlyAvg" Text="$0.00" FontAttributes="Bold" FontSize="22"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,6,0,0">
+                                        <Label Text="Budget Used" Opacity="0.7"/>
+                                        <Label x:Name="MonthlyBudgetUsed" Grid.Column="1" Text="—" FontAttributes="Bold"/>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Frame>
+
+                            <!-- ===== Category Breakdown ===== -->
+                            <Frame Padding="18" CornerRadius="14" HasShadow="False"
+                                   BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E1E1E'}">
+                                <VerticalStackLayout Spacing="12">
+                                    <Label Text="Category Breakdown (This Month)" FontAttributes="Bold"/>
+
+                                    <!-- Header row -->
+                                    <Grid ColumnDefinitions="*,Auto" Padding="0,0,4,4">
+                                        <Label Text="Category" Opacity="0.7"/>
+                                        <Label Grid.Column="1" Text="Amount"
+                                               HorizontalTextAlignment="End" Opacity="0.7"/>
+                                    </Grid>
+
+                                    <!-- Rows are added from code-behind -->
+                                    <VerticalStackLayout x:Name="CategoryStack" Spacing="10"/>
+                                </VerticalStackLayout>
+                            </Frame>
+
+                        </VerticalStackLayout>
+                    </ScrollView>
+                </Frame>
+            </Grid>
+        </ScrollView>
+    </Grid>
+</ContentPage>
