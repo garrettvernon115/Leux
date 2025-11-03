@@ -1,5 +1,7 @@
 ﻿namespace Leux;
 
+using Leux.Resources.Pages;
+
 public partial class AppShell : Shell
 {
 	public AppShell()

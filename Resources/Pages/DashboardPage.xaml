@@ -7,28 +7,23 @@
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*">
-        <!-- Navigation Header -->
         <local:NavigationHeader Grid.Row="0" />
 
-        <!-- Main Content -->
         <ScrollView Grid.Row="1">
             <VerticalStackLayout BackgroundColor="White" Padding="20" Spacing="20">
                 <Grid RowDefinitions="*,*"  ColumnDefinitions="*,*,*" ColumnSpacing="20" RowSpacing="25" HorizontalOptions="FillAndExpand">
-                    <!-- Today's Spending -->
                     <Frame Grid.Column="0" BackgroundColor="MediumPurple" CornerRadius="10" Padding="10" HeightRequest="100">
                         <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
                             <Label Text="Today's Spending" FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center"/>
                             <Label Text="$47.82" FontSize="14" HorizontalTextAlignment="Center" />
                         </VerticalStackLayout>
                     </Frame>
-                    <!-- This Week -->
                     <Frame Grid.Column="1" BackgroundColor="MediumPurple" CornerRadius="10" Padding="10" HeightRequest="100">
                         <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
                             <Label Text="This Week" FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" />
                             <Label Text="$234.56" FontSize="14" HorizontalTextAlignment="Center" />
                         </VerticalStackLayout>
                     </Frame>
-                    <!-- This Month -->
                     <Frame Grid.Column="2" BackgroundColor="MediumPurple" CornerRadius="10" Padding="10" HeightRequest="100">
                         <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
                             <Label Text="This Month" FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" />
@@ -36,28 +31,52 @@
                         </VerticalStackLayout>
                     </Frame>
                 </Grid>
-                <!-- Quick Add Expenses -->
+
                 <Frame BackgroundColor="LightGrey"  CornerRadius="10" Padding="10">
                     <VerticalStackLayout Spacing="10">
                         <Label TextColor="Black" Text="Quick Add Expenses" FontSize="20" FontAttributes="Bold" />
-                        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
-                            <!-- ADDED: x:Name attributes to identify the input fields -->
-                            <Entry x:Name="DescriptionEntry" Grid.Column="0" TextColor="Black" Placeholder="Description" />
-                            <Entry x:Name="AmountEntry" Grid.Column="1" TextColor="Black" Placeholder="Amount" Keyboard="Numeric" />
-                            <Picker Grid.Column="2" TitleColor="Black" TextColor="Black" x:Name="CategoryPicker" Title="Category">
+
+                        <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*,*" ColumnSpacing="10" RowSpacing="10">
+
+                            <Entry x:Name="DescriptionEntry" 
+                                   Grid.Row="0" Grid.Column="0" 
+                                   TextColor="Black" 
+                                   Placeholder="Description" />
+
+                            <Entry x:Name="AmountEntry" 
+                                   Grid.Row="0" Grid.Column="1" 
+                                   TextColor="Black" 
+                                   Placeholder="Amount" 
+                                   Keyboard="Numeric" />
+
+                            <Picker Grid.Row="1" Grid.Column="0" 
+                                    TitleColor="Black" 
+                                    TextColor="Black" 
+                                    x:Name="CategoryPicker" 
+                                    Title="Category">
                                 <Picker.Items>
                                     <x:String>Food &amp; Drink</x:String>
                                     <x:String>Shopping</x:String>
                                     <x:String>Transport</x:String>
                                     <x:String>Entertainment</x:String>
+                                    <x:String>Utilities</x:String>
+                                    <x:String>Other</x:String>
                                 </Picker.Items>
                             </Picker>
-                            <!-- ADDED: Clicked event to trigger our backend code -->
-                            <Button Grid.Column="3" Text="Add" BackgroundColor="Green" TextColor="White" Clicked="OnAddExpenseClicked" />
+
+                            <DatePicker x:Name="ExpenseDatePicker"
+                                        Grid.Row="1" Grid.Column="1" />
+
                         </Grid>
+
+                        <Button Text="Add" 
+                                BackgroundColor="Green" 
+                                TextColor="White" 
+                                Clicked="OnAddExpenseClicked" />
+
                     </VerticalStackLayout>
                 </Frame>
-                <!-- Today's Expenses -->
+
                 <Label TextColor="Black" Text="Today's Expenses" FontSize="20" FontAttributes="Bold" />
             </VerticalStackLayout>
         </ScrollView>
