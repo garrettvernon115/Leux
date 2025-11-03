@@ -5,6 +5,7 @@ using Leux.Services;
 using Leux.Resources.Firestore.Example;
 using Microsoft.Extensions.Logging;
 using Leux.Resources.Models;
+using Leux.Resources.Pages;
 
 namespace Leux;
 
@@ -63,6 +64,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IFireStoreServiceCounter, FirestoreServiceCounter>();
         builder.Services.AddSingleton<IDashboardService, DashboardService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddSingleton<IBudgetService, BudgetService>();
 
         // builder.Services.AddSingleton<IReportService, ReportService>(); TODO ReportService
 

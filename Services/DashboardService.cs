@@ -5,22 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using Google.Cloud.Firestore;
 using Leux.Resources.Models;
+using Google.Cloud.Firestore;
+using Leux.Resources.Firestore; 
+
 
 
 namespace Leux.Services
 {
     public class DashboardService : IDashboardService
     {
-        private readonly FirestoreDb _firestoreDb;
-        public DashboardService(FirestoreDb firestoreDb)
+        
+        private readonly FirestoreDb _firestoreDb = FirestoreDatabase.Database;
+
+        
+        public DashboardService()
         {
-            _firestoreDb = firestoreDb;
         }
 
         public async Task<bool> AddExpenseAsync(string userId, ExpenseEntry newExpense)
         {
             try
             {
+                
                 DocumentReference userDocRef = _firestoreDb.Collection("users").Document(userId);
                 await userDocRef.UpdateAsync("expenses", FieldValue.ArrayUnion(newExpense));
                 return true;
