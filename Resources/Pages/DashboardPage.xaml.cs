@@ -3,6 +3,7 @@ using Leux.Resources.Models;
 using Google.Cloud.Firestore;
 using System.Diagnostics;
 using Firebase.Auth;
+
 namespace Leux
 {
     public partial class DashboardPage : ContentPage
@@ -11,19 +12,21 @@ namespace Leux
         private readonly FirebaseAuthClient _authClient;
         private readonly INavigationService _navigationService;
 
-        public DashboardPage(IDashboardService dashboardService,FirebaseAuthClient authClient, INavigationService navigationService)
+        public DashboardPage(IDashboardService dashboardService, FirebaseAuthClient authClient, INavigationService navigationService)
         {
             InitializeComponent();
             _dashboardService = dashboardService;
             _authClient = authClient;
             _navigationService = navigationService;
+
+            ExpenseDatePicker.Date = DateTime.Today;
+            CategoryPicker.SelectedIndex = 0; 
         }
 
         private async void OnAddExpenseClicked(object sender, EventArgs e)
         {
             try
             {
-                // Get the currently signed-in user's ID from the auth client.
                 string currentUserId = _authClient?.User?.Uid;
 
                 if (string.IsNullOrWhiteSpace(currentUserId))
@@ -36,7 +39,12 @@ namespace Leux
                 var amountText = AmountEntry.Text;
                 var category = CategoryPicker.SelectedItem as string;
 
-                if (string.IsNullOrWhiteSpace(description) || string.IsNullOrWhiteSpace(amountText) || string.IsNullOrWhiteSpace(category) || !double.TryParse(amountText, out double amount))
+                DateTime selectedDate = ExpenseDatePicker.Date;
+
+                if (string.IsNullOrWhiteSpace(description) ||
+                    string.IsNullOrWhiteSpace(amountText) ||
+                    string.IsNullOrWhiteSpace(category) ||
+                    !double.TryParse(amountText, out double amount))
                 {
                     await DisplayAlert("Error", "Please fill in all fields correctly.", "OK");
                     return;
@@ -47,7 +55,7 @@ namespace Leux
                     Name = description,
                     Category = category,
                     Cost = amount,
-                    Date = Timestamp.GetCurrentTimestamp()
+                    Date = Timestamp.FromDateTime(selectedDate.ToUniversalTime())
                 };
 
                 bool success = await _dashboardService.AddExpenseAsync(currentUserId, newExpense);
@@ -57,7 +65,8 @@ namespace Leux
                     await DisplayAlert("Success!", "A new expense was added to your record.", "OK");
                     DescriptionEntry.Text = "";
                     AmountEntry.Text = "";
-                    CategoryPicker.SelectedIndex = -1;
+                    CategoryPicker.SelectedIndex = 0; 
+                    ExpenseDatePicker.Date = DateTime.Today; 
                 }
                 else
                 {
