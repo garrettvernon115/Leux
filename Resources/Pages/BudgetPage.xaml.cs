@@ -16,18 +16,17 @@ namespace Leux.Resources.Pages
     {
         private readonly IBudgetService _budgetService;
         private readonly FirebaseAuthClient _authClient;
-
+        private readonly INavigationService _navigationService;
         
         public ObservableCollection<BudgetSummary> BudgetSummaries { get; set; }
 
-        public BudgetPage()
+        public BudgetPage(INavigationService navigationService, IBudgetService budgetService, FirebaseAuthClient authClient)
         {
             InitializeComponent();
 
-            
-            _budgetService = Application.Current.MainPage.Handler.MauiContext.Services.GetService<IBudgetService>();
-            _authClient = Application.Current.MainPage.Handler.MauiContext.Services.GetService<FirebaseAuthClient>();
-
+            _budgetService = budgetService;
+            _navigationService = navigationService;
+            _authClient = authClient;
            
             BudgetSummaries = new ObservableCollection<BudgetSummary>();
             BudgetsCollectionView.ItemsSource = BudgetSummaries;
@@ -163,6 +162,19 @@ namespace Leux.Resources.Pages
             {
                 await DisplayAlert("Error", $"An unexpected error occurred: {ex.Message}", "OK");
                 Console.WriteLine($"Save Budget Error: {ex.Message}");
+            }
+        }
+
+        private async void OnSignOut(object sender, EventArgs e)
+        {
+            try
+            {
+                _authClient.SignOut();
+                await _navigationService.NavigateToLoginAsync();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Failed to sign out: {ex.Message}", "OK");
             }
         }
     }
