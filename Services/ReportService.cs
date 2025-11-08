@@ -10,12 +10,30 @@ namespace Leux.Services
 {
     public class ReportService : IReportService
     {
-        private readonly FirestoreDb _firestoreDb;
-        public ReportService(FirestoreDb firestoreDb)
+        private readonly FirestoreDb _firestoreDb = FireStoreDatabase.Database;
+        private readonly CollectionReference _usersCollection;
+        public ReportService()
         {
-            _firestoreDb = firestoreDb;
+            _usersCollection = _firestoreDb.Collection("users");
         }
 
-        // public async Task<ReportData> GetReportDataAsync(string userId) { }
+        public async Task<List<ReportData>> GetReportDataAsync(string userId)
+        {
+            try
+            {
+                DocumentReference userDocRef = _usersCollection.Document(userId);
+                DocumentSnapshot userSnapshot = await userDocRef.GetSnapshotAsync();
+                if (userSnapshot.Exists)
+                {
+                    var userDoc = userSnapshot.ConvertTo<UserDocument>();
+                    return userDoc.Reports ?? new List<ReportData>();
+                }
+                return new List<ReportData>();
+            }
+            catch
+            {
+                return new List<ReportData>();
+            }
+        }
     }
 }
