@@ -38,6 +38,8 @@ namespace Leux.Resources.Models
         public double MonthlyAvg { get; set; }
         public string MonthlyBudgetUsed { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+
         public List<CategoryData> Categories { get; set; }
     }
 

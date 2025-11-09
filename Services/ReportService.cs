@@ -17,7 +17,7 @@ namespace Leux.Services
             _usersCollection = _firestoreDb.Collection("users");
         }
 
-        public async Task<List<ReportData>> GetReportDataAsync(string userId)
+        public async Task<ReportData?> GetReportDataAsync(string userId)
         {
             try
             {
@@ -26,13 +26,13 @@ namespace Leux.Services
                 if (userSnapshot.Exists)
                 {
                     var userDoc = userSnapshot.ConvertTo<UserDocument>();
-                    return userDoc.Reports ?? new List<ReportData>();
+                    return userDoc.Reports?.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
                 }
-                return new List<ReportData>();
+                return null;
             }
             catch
             {
-                return new List<ReportData>();
+                return null;
             }
         }
     }
