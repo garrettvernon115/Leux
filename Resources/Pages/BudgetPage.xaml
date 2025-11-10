@@ -2,54 +2,140 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Leux.Resources.Pages"
-             x:Class="Leux.BudgetPage"
+             x:Class="Leux.Resources.Pages.BudgetPage"
+             xmlns:models="clr-namespace:Leux.Resources.Models"
              Title="Budget Management"
-             Shell.NavBarIsVisible="False">
+             BackgroundColor="{StaticResource Gray100}">
 
-    <Grid RowDefinitions="Auto,*">
-        <!-- Navigation Header -->
+    <Grid RowDefinitions="Auto, Auto, *">
+
         <local:NavigationHeader Grid.Row="0" />
 
-        <!-- Main Content -->
-        <Grid Grid.Row="1">
-            <StackLayout Padding="20" Spacing="15" BackgroundColor="White">
-                <Label Text="Budget Management" FontSize="24" HorizontalOptions="Start" VerticalOptions="Start" TextColor="Black" />
-                <Button Text="Add Budget" Clicked="OnAddBudgetClicked" VerticalOptions="Start" HorizontalOptions="End" BackgroundColor="LimeGreen" />
-                <Frame x:Name="BudgetDisplayFrame"
-                       IsVisible="False"
-                       BorderColor="Gray"
-                       CornerRadius="8"
-                       Padding="15"
-                       BackgroundColor="DarkGray">
-                    <StackLayout>
-                        <Label x:Name="BudgetNameLabel" Text="Name: " FontSize="16" TextColor="Black" />
-                        <Label x:Name="BudgetAmountLabel" Text="Amount: " FontSize="16" TextColor="Black" />
-                        <Label x:Name="BudgetDateLabel" Text="Date: " FontSize="16" TextColor="Black" />
-                    </StackLayout>
-                </Frame>
-            </StackLayout>
-
-            <!-- Popup Overlay-->
-            <ContentView x:Name="PopupOverlay" IsVisible="False"
-                         BackgroundColor="#80000000"
-                         VerticalOptions="FillAndExpand"
-                         HorizontalOptions="FillAndExpand">
-                <Frame BackgroundColor="White"
-                       Padding="20"
-                       CornerRadius="10"
-                       VerticalOptions="Center"
-                       HorizontalOptions="Center"
-                       WidthRequest="300">
-                    <StackLayout Spacing="15">
-                        <Label Text="New Budget" FontSize="20" HorizontalOptions="Center" TextColor="Black"/>
-                        <Entry x:Name="BudgetNameEntry" Placeholder="Budget Name" TextColor="Black" />
-                        <Entry x:Name="BudgetAmountEntry" Placeholder="Amount" Keyboard="Numeric" TextColor="Black" />
-                        <DatePicker x:Name="BudgetDatePicker" TextColor="Black" />
-                        <Button Text="Save" Clicked="OnSaveBudgetClicked" />
-                        <Button Text="Cancel" Clicked="OnCancelClicked" />
-                    </StackLayout>
-                </Frame>
-            </ContentView>
+        <Grid Grid.Row="1" Padding="20" ColumnDefinitions="*,Auto">
+            <Label Text="Budget Management" 
+                   FontSize="24" 
+                   HorizontalOptions="Start" 
+                   VerticalOptions="Center" 
+                   TextColor="Black" />
+            <Button Grid.Column="1"
+                    Text="Add Budget" 
+                    Clicked="OnAddBudgetClicked" 
+                    VerticalOptions="Center" 
+                    HorizontalOptions="End" 
+                    BackgroundColor="LimeGreen" />
         </Grid>
+
+        <Grid Grid.Row="2">
+
+            <ActivityIndicator x:Name="LoadingSpinner"
+                               IsRunning="True" 
+                               IsVisible="True"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center" />
+
+            <CollectionView x:Name="BudgetsCollectionView"
+                            IsVisible="False"
+                            ItemsSource="{Binding BudgetSummaries}">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:BudgetSummary">
+
+                        <Frame Margin="16,8"
+                               Padding="16"
+                               CornerRadius="8"
+                               HasShadow="True"
+                               BorderColor="{StaticResource Gray300}">
+
+                            <Grid RowSpacing="8" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0" 
+                                       Text="{Binding Name}" 
+                                       FontAttributes="Bold"
+                                       FontSize="18"
+                                       TextColor="{StaticResource Gray900}"/>
+
+                                <Label Grid.Row="0" Grid.Column="1" 
+                                       Text="{Binding CurrentSpent, StringFormat='{0:C}'}" 
+                                       FontAttributes="Bold"
+                                       FontSize="22"
+                                       TextColor="#E63946" 
+                                       HorizontalOptions="End" />
+
+                                <Label Grid.Row="1" Grid.Column="0" 
+                                       Text="Total spending limit" 
+                                       FontSize="14"
+                                       TextColor="{StaticResource Gray600}"/>
+
+                                <Label Grid.Row="1" Grid.Column="1" 
+                                       Text="{Binding SpendingLimit, StringFormat='of {0:C}'}"
+                                       FontSize="14"
+                                       TextColor="{StaticResource Gray600}"
+                                       HorizontalOptions="End" />
+
+                                <ProgressBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                             Progress="{Binding PercentSpent}"
+                                             ProgressColor="#E63946" />
+
+                                <Label Grid.Row="3" Grid.Column="0"
+                                       Text="{Binding PercentSpent, StringFormat='{0:P0} spent'}"
+                                       TextColor="#B5651D" 
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+
+                                <Label Grid.Row="3" Grid.Column="1"
+                                       Text="{Binding AmountRemaining, StringFormat='{0:C} remaining'}"
+                                       TextColor="#2A9D8F"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="End"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+
+        <ContentView x:Name="PopupOverlay" IsVisible="False"
+                     BackgroundColor="#80000000"
+                     VerticalOptions="FillAndExpand"
+                     HorizontalOptions="FillAndExpand"
+                     Grid.RowSpan="3">
+
+            <Frame BackgroundColor="White"
+                   Padding="20"
+                   CornerRadius="10"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"
+                   WidthRequest="300">
+
+                <StackLayout Spacing="15">
+                    <Label Text="New Budget" FontSize="20" HorizontalOptions="Center" TextColor="Black"/>
+                    <Entry x:Name="BudgetNameEntry" Placeholder="Budget Name (e.g. My Food Budget)" TextColor="Black" />
+
+                    <Picker x:Name="CategoryPicker" 
+                            Title="Select Category"
+                            TextColor="Black" />
+
+                    <Entry x:Name="BudgetAmountEntry" Placeholder="Amount" Keyboard="Numeric" TextColor="Black" />
+                    <DatePicker x:Name="BudgetDatePicker" TextColor="Black" />
+
+                    <Button Text="Save" Clicked="OnSaveBudgetClicked" />
+                    <Button Text="Cancel" Clicked="OnCancelClicked" />
+                </StackLayout>
+            </Frame>
+        </ContentView>
     </Grid>
 </ContentPage>
