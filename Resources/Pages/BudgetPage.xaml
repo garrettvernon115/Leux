@@ -9,21 +9,20 @@
 
     <Grid RowDefinitions="Auto, Auto, *">
 
-        <!-- Navigation Header -->
         <local:NavigationHeader Grid.Row="0" />
 
         <Grid Grid.Row="1" Padding="20" ColumnDefinitions="*,Auto">
             <Label Text="Budget Management" 
-               FontSize="24" 
-               HorizontalOptions="Start" 
-               VerticalOptions="Center" 
-               TextColor="Black" />
+                   FontSize="24" 
+                   HorizontalOptions="Start" 
+                   VerticalOptions="Center" 
+                   TextColor="Black" />
             <Button Grid.Column="1"
-                Text="Add Budget" 
-                Clicked="OnAddBudgetClicked" 
-                VerticalOptions="Center" 
-                HorizontalOptions="End" 
-                BackgroundColor="LimeGreen" />
+                    Text="Add Budget" 
+                    Clicked="OnAddBudgetClicked" 
+                    VerticalOptions="Center" 
+                    HorizontalOptions="End" 
+                    BackgroundColor="LimeGreen" />
         </Grid>
 
         <Grid Grid.Row="2">
