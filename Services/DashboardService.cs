@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Google.Cloud.Firestore;
 using Leux.Resources.Models;
 using Google.Cloud.Firestore;
-using Leux.Resources.Firestore; 
+using Leux.Resources.Firestore;
+using Firebase.Auth;
 
 
 
@@ -26,7 +27,6 @@ namespace Leux.Services
         {
             try
             {
-                
                 DocumentReference userDocRef = _firestoreDb.Collection("users").Document(userId);
                 await userDocRef.UpdateAsync("expenses", FieldValue.ArrayUnion(newExpense));
                 return true;

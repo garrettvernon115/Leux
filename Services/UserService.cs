@@ -9,6 +9,8 @@ namespace Leux.Services
     public class UserService : IUserService
     {
         private readonly FirebaseAuthClient _authClient;
+        private const string AUTH_TOKEN_KEY = "auth_token";
+        private const string USER_ID_KEY = "user_id";
 
         public FirebaseAuthClient AuthClient => _authClient;
 
@@ -46,12 +48,46 @@ namespace Leux.Services
             try
             {
                 await _authClient.SignInWithEmailAndPasswordAsync(email, password);
+
+                if (_authClient?.User != null)
+                {
+                    string token = await _authClient.User.GetIdTokenAsync(false);
+                    await SecureStorage.SetAsync(AUTH_TOKEN_KEY, token);
+                    await SecureStorage.SetAsync(USER_ID_KEY, _authClient.User.Uid);
+                }
                 return true;
             }
             catch (FirebaseAuthException)
             {
                 return false;
             }
+        }
+
+        public async Task<bool> IsUserLoggedInAsync()
+        {
+            try
+            {
+                string token = await SecureStorage.GetAsync(AUTH_TOKEN_KEY);
+                System.Diagnostics.Debug.WriteLine($"Token exists: {!string.IsNullOrEmpty(token)}");
+                System.Diagnostics.Debug.WriteLine($"_authClient.User is null: {_authClient.User == null}");
+
+                if (string.IsNullOrEmpty(token))
+                    return false;
+
+                return true; // If token exists, trust it
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"IsUserLoggedInAsync error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task LogoutAsync()
+        {
+            _authClient.SignOut();
+            SecureStorage.Remove(AUTH_TOKEN_KEY);
+            SecureStorage.Remove(USER_ID_KEY);
         }
 
         // New Implementation for changing the password
