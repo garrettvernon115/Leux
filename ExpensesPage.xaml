@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Leux.ExpensesPage">
+
+    <ContentPage.Resources>
+        <Color x:Key="Bg0">#121214</Color>
+        <Color x:Key="CardBg">#1E1F25</Color>
+        <Color x:Key="CardStroke">#2C2D33</Color>
+        <Color x:Key="TextMain">#F5F6F8</Color>
+        <Color x:Key="TextSub">#B9BCC2</Color>
+        <Color x:Key="AccentViolet">#7C5CFF</Color>
+        <Color x:Key="DangerRed">#E5484D</Color>
+        <Color x:Key="ChipBg">#2A2B32</Color>
+
+        <Style TargetType="ContentPage">
+            <Setter Property="BackgroundColor" Value="{StaticResource Bg0}" />
+        </Style>
+
+        <LinearGradientBrush x:Key="HeaderGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#6E5DFF" Offset="0.0"/>
+            <GradientStop Color="#3940A7" Offset="1.0"/>
+        </LinearGradientBrush>
+
+        <Style x:Key="Card" TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="{StaticResource CardBg}" />
+            <Setter Property="BorderColor" Value="{StaticResource CardStroke}" />
+            <Setter Property="HasShadow" Value="False" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="16" />
+        </Style>
+
+        <Style x:Key="TabButton" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="#00000000"/>
+            <Setter Property="TextColor" Value="{StaticResource TextMain}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,8"/>
+        </Style>
+
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="{StaticResource AccentViolet}"/>
+            <Setter Property="TextColor" Value="White"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="HeightRequest" Value="44"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="BackgroundColor" Value="{StaticResource DangerRed}"/>
+        </Style>
+
+        <Style x:Key="H1" TargetType="Label">
+            <Setter Property="TextColor" Value="{StaticResource TextMain}"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="Muted" TargetType="Label">
+            <Setter Property="TextColor" Value="{StaticResource TextSub}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <Grid Padding="20,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Frame Grid.Row="0" Style="{StaticResource Card}" Padding="0" Margin="0,0,0,14">
+                <Grid Padding="18,14">
+                    <Grid.Background>
+                        <StaticResource Key="HeaderGradient"/>
+                    </Grid.Background>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Leux" FontSize="20" FontAttributes="Bold" TextColor="White"/>
+                        <Label Text="Welcome back, John!" Style="{StaticResource Muted}" TextColor="#EAEAF2"/>
+                    </VerticalStackLayout>
+
+                    <Button Grid.Column="1"
+                            Text="Logout"
+                            Style="{StaticResource DangerButton}"
+                            Clicked="OnLogout"/>
+                </Grid>
+            </Frame>
+
+            <!-- Nav Tabs -->
+            <Frame Grid.Row="1" Style="{StaticResource Card}" Padding="10" Margin="0,0,0,14">
+                <Grid ColumnSpacing="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Style="{StaticResource TabButton}" Text="🏠  Dashboard" Clicked="OnTabDashboard"/>
+                    <Button Grid.Column="1" Style="{StaticResource TabButton}" Text="🧾  Expenses" Clicked="OnTabExpenses"/>
+                    <Button Grid.Column="2" Style="{StaticResource TabButton}" Text="💰  Budget" Clicked="OnTabBudget"/>
+                    <Button Grid.Column="3" Style="{StaticResource TabButton}" Text="📊  Reports" Clicked="OnTabReports"/>
+                    <Button Grid.Column="4" Style="{StaticResource TabButton}" Text="👤  Profile" Clicked="OnTabProfile"/>
+                </Grid>
+            </Frame>
+
+            <!-- Centered container -->
+            <Grid Grid.Row="2" Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="14" WidthRequest="960" MaximumWidthRequest="960">
+
+                    <!-- Title + Filters -->
+                    <Grid ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Text="All Expenses" Style="{StaticResource H1}" VerticalOptions="Center" />
+
+                        <Picker Grid.Column="1"
+                                x:Name="CategoryFilter"
+                                Title="All Categories"
+                                SelectedIndexChanged="OnFilterChanged"
+                                TextColor="{StaticResource TextMain}"
+                                BackgroundColor="{StaticResource CardBg}">
+                            <Picker.Items>
+                                <x:String>All Categories</x:String>
+                                <x:String>Food &amp; Drink</x:String>
+                                <x:String>Shopping</x:String>
+                                <x:String>Transport</x:String>
+                                <x:String>Entertainment</x:String>
+                                <x:String>Other</x:String>
+                            </Picker.Items>
+                        </Picker>
+
+                        <Picker Grid.Column="2"
+                                x:Name="RangeFilter"
+                                Title="Last 30 days"
+                                SelectedIndexChanged="OnFilterChanged"
+                                TextColor="{StaticResource TextMain}"
+                                BackgroundColor="{StaticResource CardBg}">
+                            <Picker.Items>
+                                <x:String>Last 7 days</x:String>
+                                <x:String>Last 30 days</x:String>
+                                <x:String>Last 90 days</x:String>
+                                <x:String>All time</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </Grid>
+
+                    <!-- List -->
+                    <CollectionView x:Name="AllList"
+                                    ItemsSource="{Binding AllExpenses}"
+                                    EmptyView="No expenses found for the selected filters.">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Style="{StaticResource Card}" Margin="0,8,0,0">
+                                    <Grid ColumnSpacing="10" RowSpacing="6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <VerticalStackLayout Spacing="6">
+                                            <Border BackgroundColor="{StaticResource ChipBg}"
+                                                    StrokeShape="RoundRectangle 10"
+                                                    Padding="8,2"
+                                                    HorizontalOptions="Start">
+                                                <Label Text="{Binding Category}" 
+                                                       TextColor="{StaticResource TextSub}" FontSize="12"/>
+                                            </Border>
+
+                                            <Label Text="{Binding Description}" 
+                                                   TextColor="{StaticResource TextMain}" FontSize="16"/>
+
+                                            <Label Text="{Binding OccurredAt, StringFormat='{}{0:MMM d, h:mm tt}'}"
+                                                   Style="{StaticResource Muted}"/>
+                                        </VerticalStackLayout>
+
+                                        <Label Grid.Column="1"
+                                               Text="{Binding Amount, StringFormat='${0:F2}'}"
+                                               TextColor="{StaticResource TextMain}"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center"/>
+
+                                        <HorizontalStackLayout Grid.Column="2" Spacing="6" VerticalOptions="Center">
+                                            <Button Text="Edit"  Style="{StaticResource TabButton}" Clicked="OnEditClicked"/>
+                                            <Button Text="Delete" Style="{StaticResource DangerButton}" Clicked="OnDeleteClicked"/>
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                </VerticalStackLayout>
+            </Grid>
+
+            <ContentView Grid.Row="3" HeightRequest="12"/>
+        </Grid>
+    </ScrollView>
+</ContentPage>
