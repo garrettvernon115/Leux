@@ -16,6 +16,9 @@ namespace Leux.Services
 
         [FirestoreProperty("budgets")]
         public List<Budget> Budgets { get; set; }
+
+        [FirestoreProperty("reports")]
+        public List<ReportData> Reports { get; set; }
     }
 
     public class BudgetService : IBudgetService
