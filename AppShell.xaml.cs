@@ -13,6 +13,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
         Routing.RegisterRoute(nameof(ReportPage), typeof(ReportPage));
         Routing.RegisterRoute(nameof(BudgetPage), typeof(BudgetPage));
+        Routing.RegisterRoute(nameof(ExpensesPage), typeof(ExpensesPage));
     }
 
     public void SwitchToMainApp()

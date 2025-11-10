@@ -84,6 +84,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ProfilePage>();
         builder.Services.AddTransient<ReportPage>();
         builder.Services.AddTransient<BudgetPage>();
+        builder.Services.AddTransient<ExpensesPage>();
 
         builder.Services.AddSingleton<AppShell>();
 

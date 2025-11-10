@@ -38,9 +38,12 @@ public class TodayEntriesService
                 Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
                 Description = d.TryGetValue("description", out var ds) ? (string)ds : "",
                 Amount = d.TryGetValue("amount", out var a) ? ToDouble(a) : 0d,
+                /**
                 OccurredAt = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts
                                 ? ts.ToDateTime().ToLocalTime()
                                 : DateTime.Now
+                **/
+                OccurredAt = Timestamp.FromDateTime(DateTime.Now) // Refactor change fix this for logic
             });
         }
         return list;
