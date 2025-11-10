@@ -24,7 +24,7 @@ public partial class NavigationHeader : ContentView
 
     private async void OnExpensesClicked(object sender, EventArgs e)
     {
-        // await Shell.Current.GoToAsync($"{nameof(ExpensesPage)}");
+        await Shell.Current.GoToAsync($"{nameof(ExpensesPage)}");
     }
 
     private async void OnProfileClicked(object sender, EventArgs e)

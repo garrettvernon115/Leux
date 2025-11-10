@@ -1,4 +1,6 @@
-﻿namespace Leux;
+﻿using Google.Cloud.Firestore;
+
+namespace Leux;
 
 public class ExpenseItem
 {
@@ -6,11 +8,11 @@ public class ExpenseItem
     public string Category { get; set; } = "Other";
     public string Description { get; set; } = "";
     public double Amount { get; set; }
-    public DateTime OccurredAt { get; set; } = DateTime.Now;
+    public Timestamp OccurredAt { get; set; }
 
     
     public string AmountText => $"${Amount:F2}";
-    public string TimeText => OccurredAt.ToString("hh:mm tt");
+    public string TimeText => OccurredAt.ToString();
 
     public Color CategoryColor => Category switch
     {

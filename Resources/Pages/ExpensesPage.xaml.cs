@@ -69,9 +69,13 @@ public partial class ExpensesPage : ContentPage
                     Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
                     Description = d.TryGetValue("description", out var ds) ? (string)ds : "",
                     Amount = ToDouble(d.TryGetValue("amount", out var a) ? a : 0d),
-                    OccurredAt = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts
+                    
+                    /** OccurredAt = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts
                                  ? ts.ToDateTime().ToLocalTime()
                                  : DateTime.Now
+                    **/
+
+                    OccurredAt = Timestamp.FromDateTime(DateTime.Now) // Refactor change fix this for logic
                 };
 
                 if (!filterByCategory || item.Category == selectedCategory)
@@ -124,19 +128,6 @@ public partial class ExpensesPage : ContentPage
             if (confirm) AllExpenses.Remove(item);
         }
     }
-
-    // Top actions / navigation
-    private void OnLogout(object sender, EventArgs e) =>
-        Application.Current.MainPage = new LoginPage();
-
-    private void OnTabDashboard(object sender, EventArgs e) =>
-        Application.Current.MainPage = new DashboardPage();
-    private void OnTabExpenses(object sender, EventArgs e) { /* already here */ }
-    private void OnTabBudget(object sender, EventArgs e) { /* TODO */ }
-    private void OnTabReports(object sender, EventArgs e) =>
-        Application.Current.MainPage = new ReportPage();
-    private void OnTabProfile(object sender, EventArgs e) =>
-        Application.Current.MainPage = new ProfilePage();
 
     private static double ToDouble(object v)
     {

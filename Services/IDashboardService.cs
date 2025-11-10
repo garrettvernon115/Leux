@@ -10,6 +10,7 @@ namespace Leux.Services
     public interface IDashboardService
     {
         Task<bool> AddExpenseAsync(string userId, ExpenseEntry newExpense);
+        Task<List<ExpenseEntry>> GetUserExpensesAsync(string userId);
     }
 }
 

@@ -1,11 +1,12 @@
 ﻿using Firebase.Auth;
 using Firebase.Auth.Providers;
+using Firebase.Auth.Repository;
 using Google.Cloud.Firestore;
-using Leux.Services;
 using Leux.Resources.Firestore.Example;
-using Microsoft.Extensions.Logging;
 using Leux.Resources.Models;
 using Leux.Resources.Pages;
+using Leux.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Leux;
 
@@ -60,6 +61,14 @@ public static class MauiProgram
             }
         });
 
+        builder.Services.AddSingleton(new FirebaseAuthClient(new FirebaseAuthConfig()
+        {
+            ApiKey = "AIzaSyA8dJzxokMX81gk5uU4P9bByaYNGFhGlC0",
+            AuthDomain = "leux-ed1c0.firebaseapp.com",
+            Providers = new[] { new EmailProvider() },
+            UserRepository = new FileUserRepository("Leux")
+        }));
+
         builder.Services.AddSingleton<IUserService, UserService>();
         builder.Services.AddSingleton<IFireStoreServiceCounter, FirestoreServiceCounter>();
         builder.Services.AddSingleton<IDashboardService, DashboardService>();
@@ -75,6 +84,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ProfilePage>();
         builder.Services.AddTransient<ReportPage>();
         builder.Services.AddTransient<BudgetPage>();
+        builder.Services.AddTransient<ExpensesPage>();
 
         builder.Services.AddSingleton<AppShell>();
 
