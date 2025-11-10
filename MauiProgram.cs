@@ -74,8 +74,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IDashboardService, DashboardService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddSingleton<IBudgetService, BudgetService>();
-
-        // builder.Services.AddSingleton<IReportService, ReportService>(); TODO ReportService
+        builder.Services.AddSingleton<IReportService, ReportService>();
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<LoginPage>();

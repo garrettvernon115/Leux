@@ -1,13 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Google.Cloud.Firestore;
 
 namespace Leux.Resources.Models
 {
+    [FirestoreData]
     public class ReportData
     {
+        [FirestoreProperty("weeklySpent")]
+        public double WeeklySpent { get; set; }
+
+        [FirestoreProperty("weeklyTx")]
+        public int WeeklyTx { get; set; }
+
+        [FirestoreProperty("weeklyAvg")]
+        public double WeeklyAvg { get; set; }
+
+        [FirestoreProperty("weeklyTopCat")]
+        public string WeeklyTopCat { get; set; }
+
+        [FirestoreProperty("budgetUsed")]
+        public string BudgetUsed { get; set; }
+
+        [FirestoreProperty("monthlySpent")]
+        public double MonthlySpent { get; set; }
+
+        [FirestoreProperty("monthlyTx")]
+        public int MonthlyTx { get; set; }
+
+        [FirestoreProperty("monthlyAvg")]
+        public double MonthlyAvg { get; set; }
+
+        [FirestoreProperty("monthlyBudgetUsed")]
+        public string MonthlyBudgetUsed { get; set; }
+
+        [FirestoreProperty("createdAt")]
+        public DateTime CreatedAt { get; set; }
+
+        [FirestoreProperty("categories")]
+        public List<CategoryData> Categories { get; set; }
+
+        // Computed properties (no Firestore attribute)
         public string WeeklyTitle
         {
             get
@@ -19,11 +52,6 @@ namespace Leux.Resources.Models
                 return $"Weekly Report ({weekStart:MMM dd} - {weekEnd:MMM d, yyyy})";
             }
         }
-        public double WeeklySpent { get; set; }
-        public int WeeklyTx { get; set; }
-        public double WeeklyAvg { get; set; }
-        public string WeeklyTopCat { get; set; }
-        public string BudgetUsed { get; set; }
 
         public string MonthlyTitle
         {
@@ -33,19 +61,15 @@ namespace Leux.Resources.Models
                 return $"Monthly Report ({monthStart:MMMM yyyy})";
             }
         }
-        public double MonthlySpent { get; set; }
-        public int MonthlyTx { get; set; }
-        public double MonthlyAvg { get; set; }
-        public string MonthlyBudgetUsed { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-
-        public List<CategoryData> Categories { get; set; }
     }
 
+    [FirestoreData]
     public class CategoryData
     {
+        [FirestoreProperty("name")]
         public string Name { get; set; }
+
+        [FirestoreProperty("amount")]
         public double Amount { get; set; }
     }
 }
