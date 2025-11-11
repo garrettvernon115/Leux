@@ -8,11 +8,11 @@ public class ExpenseItem
     public string Category { get; set; } = "Other";
     public string Description { get; set; } = "";
     public double Amount { get; set; }
-    public Timestamp OccurredAt { get; set; }
 
-    
+    public DateTime OccurredAt { get; set; }
+
+
     public string AmountText => $"${Amount:F2}";
-    public string TimeText => OccurredAt.ToString();
 
     public Color CategoryColor => Category switch
     {

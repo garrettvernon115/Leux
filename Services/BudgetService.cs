@@ -3,6 +3,7 @@ using Leux.Resources.Firestore;
 using Leux.Resources.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics; 
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,6 +12,7 @@ namespace Leux.Services
     [FirestoreData]
     internal class UserDocument
     {
+        
         [FirestoreProperty("expenses")]
         public List<ExpenseEntry> Expenses { get; set; }
 
@@ -36,7 +38,7 @@ namespace Leux.Services
             try
             {
                 newBudget.BudgetId = Guid.NewGuid().ToString();
-                newBudget.CreatedAt = Timestamp.GetCurrentTimestamp(); 
+                newBudget.CreatedAt = Timestamp.GetCurrentTimestamp();
 
                 DocumentReference userDocRef = _usersCollection.Document(userId);
                 await userDocRef.UpdateAsync("budgets", FieldValue.ArrayUnion(newBudget));
@@ -49,7 +51,6 @@ namespace Leux.Services
             }
         }
 
-        //Implementation to get all budgets
         public async Task<List<Budget>> GetUserBudgetsAsync(string userId)
         {
             try
@@ -69,29 +70,41 @@ namespace Leux.Services
             }
         }
 
-        // Implementation to get all expenses
+        
         public async Task<List<ExpenseEntry>> GetUserExpensesAsync(string userId)
         {
+            var expenses = new List<ExpenseEntry>();
             try
             {
-                DocumentReference userDocRef = _usersCollection.Document(userId);
-                DocumentSnapshot snapshot = await userDocRef.GetSnapshotAsync();
-                if (snapshot.Exists)
+               
+                CollectionReference entriesCol = _usersCollection.Document(userId).Collection("entries");
+                QuerySnapshot snapshot = await entriesCol.GetSnapshotAsync();
+
+                
+                foreach (DocumentSnapshot doc in snapshot.Documents)
                 {
-                    var userDoc = snapshot.ConvertTo<UserDocument>();
-                    return userDoc?.Expenses ?? new List<ExpenseEntry>();
+                    var d = doc.ToDictionary();
+                    var entry = new ExpenseEntry
+                    {
+                        
+                        Name = d.TryGetValue("description", out var ds) ? (string)ds : "",
+                        Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
+                        Cost = ToDouble(d.TryGetValue("amount", out var a) ? a : 0d),
+                        Date = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts ? ts : Timestamp.FromDateTime(DateTime.UtcNow)
+                    };
+                    expenses.Add(entry);
                 }
-                return new List<ExpenseEntry>();
+                return expenses;
             }
-            catch
+            catch (Exception ex)
             {
-                return new List<ExpenseEntry>();
+                Debug.WriteLine($"Error in BudgetService.GetUserExpensesAsync: {ex.Message}");
+                return expenses; 
             }
         }
 
         public async Task<List<BudgetSummary>> GetUserBudgetSummariesAsync(string userId)
         {
-            // 1. Get all data in parallel
             Task<List<ExpenseEntry>> expensesTask = GetUserExpensesAsync(userId);
             Task<List<Budget>> budgetsTask = GetUserBudgetsAsync(userId);
 
@@ -102,16 +115,15 @@ namespace Leux.Services
 
             var budgetSummaries = new List<BudgetSummary>();
 
-            // 2. Process the data
+            
             foreach (var budget in allBudgets)
             {
-                // Filter expenses that fall within the budget's time window
+               
                 var expensesInTimeframe = allExpenses.Where(e =>
                     e.Date >= budget.StartDate && e.Date <= budget.EndDate
                 );
 
-                // If the budget has a category, filter by it.
-                // If Category is null/empty, it's a "Monthly Budget" and we sum all categories.
+             
                 if (!string.IsNullOrEmpty(budget.Category))
                 {
                     expensesInTimeframe = expensesInTimeframe.Where(e =>
@@ -119,7 +131,7 @@ namespace Leux.Services
                     );
                 }
 
-                // 3. Sum the costs and create the summary object
+                
                 double currentSpent = expensesInTimeframe.Sum(e => e.Cost);
 
                 budgetSummaries.Add(new BudgetSummary
@@ -131,6 +143,15 @@ namespace Leux.Services
             }
 
             return budgetSummaries;
+        }
+
+
+        private static double ToDouble(object v)
+        {
+            if (v is double d) return d;
+            if (v is long l) return l;
+            if (v is int i) return i;
+            return double.TryParse(v?.ToString(), out var x) ? x : 0d;
         }
     }
 }

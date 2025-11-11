@@ -6,7 +6,6 @@ public class TodayEntriesService
 {
     public async Task<List<ExpenseItem>> GetTodayAsync(string userId, TimeZoneInfo? tz = null)
     {
-        // Make sure Firestore is ready (uses your existing static initializer)
         if (!Resources.Firestore.FirestoreDatabase.IsInitialized)
             await Resources.Firestore.FirestoreDatabase.InitializeAsync();
 
@@ -18,8 +17,7 @@ public class TodayEntriesService
 
         var startUtc = TimeZoneInfo.ConvertTimeToUtc(startLocal, tz);
         var endUtc = TimeZoneInfo.ConvertTimeToUtc(endLocal, tz);
-
-        // Path: users/{uid}/entries    
+   
         var q = db.Collection("users").Document(userId).Collection("entries")
             .WhereGreaterThanOrEqualTo("occurredAt", Timestamp.FromDateTime(DateTime.SpecifyKind(startUtc, DateTimeKind.Utc)))
             .WhereLessThan("occurredAt", Timestamp.FromDateTime(DateTime.SpecifyKind(endUtc, DateTimeKind.Utc)))
@@ -38,12 +36,10 @@ public class TodayEntriesService
                 Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
                 Description = d.TryGetValue("description", out var ds) ? (string)ds : "",
                 Amount = d.TryGetValue("amount", out var a) ? ToDouble(a) : 0d,
-                /**
+
                 OccurredAt = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts
-                                ? ts.ToDateTime().ToLocalTime()
-                                : DateTime.Now
-                **/
-                OccurredAt = Timestamp.FromDateTime(DateTime.Now) // Refactor change fix this for logic
+                                 ? ts.ToDateTime().ToLocalTime()
+                                 : DateTime.Now
             });
         }
         return list;

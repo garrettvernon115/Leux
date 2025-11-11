@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using Google.Cloud.Firestore;
 using Leux.Resources.Firestore;
+using Leux.Resources.Models;
+using System.Diagnostics;
 
 namespace Leux;
 
@@ -11,19 +13,42 @@ public partial class ExpensesPage : ContentPage
     private Firebase.Auth.FirebaseAuthClient? Auth =>
         AppServiceHelper.Services.GetService<Firebase.Auth.FirebaseAuthClient>();
 
+    private FirestoreDb? Db =>
+        AppServiceHelper.Services.GetService<FirestoreDb>();
+
+    private ExpenseItem? _itemToEdit;
+
     public ExpensesPage()
     {
         InitializeComponent();
         BindingContext = this;
-
-        // default filter values
-        CategoryFilter.SelectedIndex = 0; 
-        RangeFilter.SelectedIndex = 1;    
+        CategoryFilter.SelectedIndex = 0;
+        RangeFilter.SelectedIndex = 1;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        var userName = Auth?.User?.Info?.DisplayName;
+
+        if (string.IsNullOrEmpty(userName))
+        {
+            userName = Auth?.User?.Info?.Email;
+        }
+
+        if (string.IsNullOrEmpty(userName))
+        {
+            userName = "User";
+        }
+
+        if (userName.Contains("@"))
+        {
+            userName = userName.Split('@')[0];
+        }
+
+        WelcomeLabel.Text = $"Welcome back, {userName}!";
+
         await LoadExpensesAsync();
     }
 
@@ -31,15 +56,12 @@ public partial class ExpensesPage : ContentPage
     {
         try
         {
-            if (!FirestoreDatabase.IsInitialized)
-                return; 
+            if (Db is null) return;
 
             var uid = Auth?.User?.Uid ?? "demo-user-1";
-            var db = FirestoreDatabase.Database;
 
-            // Build time range
             var (startUtc, endUtc) = GetRangeUtc(RangeFilter.SelectedIndex);
-            Query q = db.Collection("users").Document(uid).Collection("entries");
+            Query q = Db.Collection("users").Document(uid).Collection("entries");
 
             if (startUtc != null && endUtc != null)
             {
@@ -50,10 +72,8 @@ public partial class ExpensesPage : ContentPage
             }
 
             q = q.OrderByDescending("occurredAt");
-
             var snap = await q.GetSnapshotAsync();
 
-            // Category filter (client-side; Firestore compound indexes would be needed otherwise)
             string selectedCategory = CategoryFilter.SelectedItem?.ToString() ?? "All Categories";
             bool filterByCategory = !string.IsNullOrWhiteSpace(selectedCategory) &&
                                     selectedCategory != "All Categories";
@@ -62,20 +82,16 @@ public partial class ExpensesPage : ContentPage
             foreach (var doc in snap.Documents)
             {
                 var d = doc.ToDictionary();
-
                 var item = new ExpenseItem
                 {
                     Id = doc.Id,
                     Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
                     Description = d.TryGetValue("description", out var ds) ? (string)ds : "",
                     Amount = ToDouble(d.TryGetValue("amount", out var a) ? a : 0d),
-                    
-                    /** OccurredAt = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts
+
+                    OccurredAt = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts
                                  ? ts.ToDateTime().ToLocalTime()
                                  : DateTime.Now
-                    **/
-
-                    OccurredAt = Timestamp.FromDateTime(DateTime.Now) // Refactor change fix this for logic
                 };
 
                 if (!filterByCategory || item.Category == selectedCategory)
@@ -88,36 +104,78 @@ public partial class ExpensesPage : ContentPage
         }
     }
 
-    // Filters
-    private async void OnFilterChanged(object sender, EventArgs e) => await LoadExpensesAsync();
-
     private (DateTime? startUtc, DateTime? endUtc) GetRangeUtc(int rangeIndex)
     {
-        // 0: last 7d, 1: last 30d, 2: last 90d, 3: all time
         if (rangeIndex == 3) return (null, null);
-
-        int days = rangeIndex switch
-        {
-            0 => 7,
-            1 => 30,
-            2 => 90,
-            _ => 30
-        };
-
+        int days = rangeIndex switch { 0 => 7, 1 => 30, 2 => 90, _ => 30 };
         var tz = TimeZoneInfo.Local;
         var endLocal = DateTime.Today.AddDays(1);
         var startLocal = endLocal.AddDays(-days);
-
         var startUtc = TimeZoneInfo.ConvertTimeToUtc(startLocal, tz);
         var endUtc = TimeZoneInfo.ConvertTimeToUtc(endLocal, tz);
         return (startUtc, endUtc);
     }
 
-    // UI-only edit/delete
-    private async void OnEditClicked(object sender, EventArgs e)
+    private async void OnFilterChanged(object sender, EventArgs e) => await LoadExpensesAsync();
+
+
+    private void OnEditClicked(object sender, EventArgs e)
     {
         if ((sender as Button)?.BindingContext is ExpenseItem item)
-            await DisplayAlert("Edit", $"UI-only edit for: {item.Description}", "OK");
+        {
+            _itemToEdit = item;
+            EditDescriptionEntry.Text = item.Description;
+            EditAmountEntry.Text = item.Amount.ToString();
+            EditCategoryPicker.SelectedItem = item.Category;
+
+            EditDatePicker.Date = item.OccurredAt;
+
+            EditPopupOverlay.IsVisible = true;
+        }
+    }
+
+    private void OnCancelEditClicked(object sender, EventArgs e)
+    {
+        EditPopupOverlay.IsVisible = false;
+        _itemToEdit = null;
+    }
+
+    private async void OnSaveEditClicked(object sender, EventArgs e)
+    {
+        if (_itemToEdit == null) return;
+
+        if (string.IsNullOrWhiteSpace(EditDescriptionEntry.Text) ||
+            !double.TryParse(EditAmountEntry.Text, out double newAmount) || newAmount <= 0 ||
+            EditCategoryPicker.SelectedItem == null)
+        {
+            await DisplayAlert("Error", "Please fill in all fields with valid data.", "OK");
+            return;
+        }
+
+        try
+        {
+            var uid = Auth?.User?.Uid ?? "demo-user-1";
+
+            var updatedData = new Dictionary<string, object>
+            {
+                { "description", EditDescriptionEntry.Text },
+                { "amount", newAmount },
+                { "category", EditCategoryPicker.SelectedItem.ToString() },
+                { "occurredAt", Timestamp.FromDateTime(EditDatePicker.Date.ToUniversalTime()) }
+            };
+
+            await Db.Collection("users").Document(uid)
+                    .Collection("entries").Document(_itemToEdit.Id)
+                    .UpdateAsync(updatedData);
+
+            EditPopupOverlay.IsVisible = false;
+            _itemToEdit = null;
+            await LoadExpensesAsync();
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Failed to save changes: {ex.Message}", "OK");
+        }
     }
 
     private async void OnDeleteClicked(object sender, EventArgs e)
@@ -125,7 +183,23 @@ public partial class ExpensesPage : ContentPage
         if ((sender as Button)?.BindingContext is ExpenseItem item)
         {
             bool confirm = await DisplayAlert("Delete", $"Delete '{item.Description}'?", "Yes", "No");
-            if (confirm) AllExpenses.Remove(item);
+            if (confirm)
+            {
+                try
+                {
+                    var uid = Auth?.User?.Uid ?? "demo-user-1";
+
+                    await Db.Collection("users").Document(uid)
+                            .Collection("entries").Document(item.Id)
+                            .DeleteAsync();
+
+                    AllExpenses.Remove(item);
+                }
+                catch (Exception ex)
+                {
+                    await DisplayAlert("Error", $"Failed to delete: {ex.Message}", "OK");
+                }
+            }
         }
     }
 

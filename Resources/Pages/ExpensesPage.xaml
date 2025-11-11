@@ -83,7 +83,7 @@
 
                     <VerticalStackLayout Spacing="2">
                         <Label Text="Leux" FontSize="20" FontAttributes="Bold" TextColor="White"/>
-                        <Label Text="Welcome back, John!" Style="{StaticResource Muted}" TextColor="#EAEAF2"/>
+                        <Label x:Name="WelcomeLabel" Text="Welcome back..." Style="{StaticResource Muted}" TextColor="#EAEAF2"/>
                     </VerticalStackLayout>
 
                 </Grid>
@@ -208,7 +208,60 @@
                 </VerticalStackLayout>
             </Grid>
 
-            <ContentView Grid.Row="3" HeightRequest="12"/>
+            <ContentView x:Name="EditPopupOverlay" 
+             IsVisible="False"
+             BackgroundColor="#80000000"
+             VerticalOptions="FillAndExpand"
+             HorizontalOptions="FillAndExpand"
+             Grid.Row="0" 
+             Grid.RowSpan="4">
+
+                <Frame BackgroundColor="{StaticResource CardBg}"
+           BorderColor="{StaticResource CardStroke}"
+           Padding="20"
+           CornerRadius="10"
+           VerticalOptions="Center"
+           HorizontalOptions="Center"
+           WidthRequest="300">
+
+                    <StackLayout Spacing="15">
+                        <Label Text="Edit Expense" Style="{StaticResource H1}" HorizontalOptions="Center"/>
+
+                        <Entry x:Name="EditDescriptionEntry" 
+                   Placeholder="Description" 
+                   TextColor="{StaticResource TextMain}" />
+
+                        <Entry x:Name="EditAmountEntry" 
+                   Placeholder="Amount" 
+                   Keyboard="Numeric" 
+                   TextColor="{StaticResource TextMain}" />
+
+                        <Picker x:Name="EditCategoryPicker" 
+                    Title="Select Category"
+                    TextColor="{StaticResource TextMain}">
+                            <Picker.Items>
+                                <x:String>Food &amp; Drink</x:String>
+                                <x:String>Shopping</x:String>
+                                <x:String>Transport</x:String>
+                                <x:String>Entertainment</x:String>
+                                <x:String>Utilities</x:String>
+                                <x:String>Other</x:String>
+                            </Picker.Items>
+                        </Picker>
+
+                        <DatePicker x:Name="EditDatePicker" 
+                        TextColor="{StaticResource TextMain}" />
+
+                        <Button Text="Save Changes" 
+                    Style="{StaticResource PrimaryButton}" 
+                    Clicked="OnSaveEditClicked" />
+
+                        <Button Text="Cancel" 
+                    Style="{StaticResource TabButton}" 
+                    Clicked="OnCancelEditClicked" />
+                    </StackLayout>
+                </Frame>
+            </ContentView>
         </Grid>
     </ScrollView>
 </ContentPage>

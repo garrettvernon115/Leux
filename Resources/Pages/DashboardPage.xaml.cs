@@ -16,9 +16,6 @@ public partial class DashboardPage : ContentPage
     private Firebase.Auth.FirebaseAuthClient? Auth =>
         AppServiceHelper.Services.GetService<Firebase.Auth.FirebaseAuthClient>();
 
-    private TodayEntriesService? EntriesSvc =>
-        AppServiceHelper.Services.GetService<TodayEntriesService>();
-
     private readonly IDashboardService _dashboardService;
     private readonly FirebaseAuthClient _authClient;
     private readonly INavigationService _navigationService;
@@ -42,7 +39,6 @@ public partial class DashboardPage : ContentPage
         await RefreshTotals();
     }
 
-    // ----------------- Firestore: Load Today's Entries -----------------
     private async Task LoadTodaysExpensesAsync()
     {
         string currentUserId = _authClient?.User?.Uid;
@@ -58,23 +54,20 @@ public partial class DashboardPage : ContentPage
         try
         {
             var expenses = await _dashboardService.GetUserExpensesAsync(currentUserId);
-            Debug.WriteLine("Total Expenses: " + expenses.Count);
+            var sortedExpenses = expenses.OrderByDescending(x => x.Date.ToDateTime());
 
-            foreach (var expense in expenses)
+            Today.Clear();
+            foreach (var expense in sortedExpenses)
             {
-                Today.Insert(0, new ExpenseItem
+                Today.Add(new ExpenseItem
                 {
                     Category = expense.Category,
                     Description = expense.Name,
                     Amount = expense.Cost,
-                    OccurredAt = expense.Date
+                    OccurredAt = expense.Date.ToDateTime().ToLocalTime()
                 });
 
-                Debug.WriteLine($"Count: {Today.Count} >= 6");
-                if (Today.Count >= 6)
-                {
-                    Today.RemoveAt(5);
-                }
+                if (Today.Count >= 6) break;
             }
 
             LoadingSpinner.IsVisible = false;
@@ -91,20 +84,20 @@ public partial class DashboardPage : ContentPage
         try
         {
             string currentUserId = _authClient?.User?.Uid;
-
-            if (!await OnQuickAdd(sender, e)) return;
-
             if (string.IsNullOrWhiteSpace(currentUserId))
             {
                 await DisplayAlert("Not Logged In", "You must be logged in to add an expense.", "OK");
                 return;
             }
 
+            if (!await OnQuickAdd(sender, e)) return;
+
             var description = DescEntry.Text;
             var amountText = AmountEntry.Text;
             var category = CategoryPicker.SelectedItem as string;
-
             DateTime selectedDate = ExpenseDatePicker.Date;
+            TimeSpan currentTime = DateTime.Now.TimeOfDay;
+            DateTime finalDateTime = selectedDate.Date + currentTime;
 
             if (string.IsNullOrWhiteSpace(description) ||
                 string.IsNullOrWhiteSpace(amountText) ||
@@ -120,22 +113,27 @@ public partial class DashboardPage : ContentPage
                 Name = description,
                 Category = category,
                 Cost = amount,
-                Date = Timestamp.FromDateTime(selectedDate.ToUniversalTime())
+                Date = Timestamp.FromDateTime(finalDateTime.ToUniversalTime())
             };
 
             bool success = await _dashboardService.AddExpenseAsync(currentUserId, newExpense);
 
             if (success)
             {
-                await DisplayAlert("Success!", "A new expense was added to your record.", "OK");
                 DescEntry.Text = "";
                 AmountEntry.Text = "";
                 CategoryPicker.SelectedIndex = 0;
                 ExpenseDatePicker.Date = DateTime.Today;
+
+                await RefreshTotals();
             }
             else
             {
                 await DisplayAlert("Failure", "Could not add the expense.", "OK");
+                if (Today.Any() && Today[0].Description == description)
+                {
+                    Today.RemoveAt(0);
+                }
             }
         }
         catch (Exception ex)
@@ -166,7 +164,7 @@ public partial class DashboardPage : ContentPage
             Category = CategoryPicker.Items[CategoryPicker.SelectedIndex],
             Description = DescEntry.Text.Trim(),
             Amount = amount,
-            OccurredAt = Timestamp.FromDateTime(ExpenseDatePicker.Date)
+            OccurredAt = ExpenseDatePicker.Date
         });
 
         if (Today.Count >= 6)
@@ -174,11 +172,9 @@ public partial class DashboardPage : ContentPage
             Today.RemoveAt(5);
         }
 
-        RefreshTotals();
         return true;
     }
 
-    // ----------------- Edit/Delete (UI-only) -----------------
     private async void OnEditClicked(object sender, EventArgs e)
     {
         if ((sender as Button)?.BindingContext is ExpenseItem item)
@@ -193,12 +189,11 @@ public partial class DashboardPage : ContentPage
             if (confirm)
             {
                 Today.Remove(item);
-                RefreshTotals();
+                await RefreshTotals();
             }
         }
     }
 
-    // ----------------- Header totals -----------------
     async Task RefreshTotals()
     {
         string currentUserId = _authClient?.User?.Uid;

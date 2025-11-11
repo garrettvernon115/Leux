@@ -165,7 +165,7 @@
                         </Frame>
                     </Grid>
 
-                    <!-- QUICK ADD (unchanged) -->
+                    <!-- QUICK ADD -->
                     <Frame Style="{StaticResource Card}">
                         <VerticalStackLayout Spacing="10">
                             <Label Text="Quick Add Expense" Style="{StaticResource H1}"/>
