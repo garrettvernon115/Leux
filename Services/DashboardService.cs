@@ -5,25 +5,37 @@ using System.Text;
 using System.Threading.Tasks;
 using Google.Cloud.Firestore;
 using Leux.Resources.Models;
+<<<<<<< Updated upstream
 using Leux.Resources.Firestore;
 using System.Diagnostics;
+=======
+
+>>>>>>> Stashed changes
 
 namespace Leux.Services
 {
     public class DashboardService : IDashboardService
     {
+<<<<<<< Updated upstream
         private readonly FirestoreDb _firestoreDb = FirestoreDatabase.Database;
         private readonly CollectionReference _usersCollection;
 
         public DashboardService()
         {
             _usersCollection = _firestoreDb.Collection("users");
+=======
+        private readonly FirestoreDb _firestoreDb;
+        public DashboardService(FirestoreDb firestoreDb)
+        {
+            _firestoreDb = firestoreDb;
+>>>>>>> Stashed changes
         }
 
         public async Task<bool> AddExpenseAsync(string userId, ExpenseEntry newExpense)
         {
             try
             {
+<<<<<<< Updated upstream
                 CollectionReference entriesCol = _usersCollection.Document(userId).Collection("entries");
 
                
@@ -37,6 +49,10 @@ namespace Leux.Services
 
                
                 await entriesCol.AddAsync(expenseData);
+=======
+                DocumentReference userDocRef = _firestoreDb.Collection("users").Document(userId);
+                await userDocRef.UpdateAsync("expenses", FieldValue.ArrayUnion(newExpense));
+>>>>>>> Stashed changes
                 return true;
             }
             catch (Exception ex)

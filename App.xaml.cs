@@ -7,6 +7,7 @@ namespace Leux;
 
 public partial class App : Application
 {
+<<<<<<< Updated upstream
 
 	private readonly IUserService _userService;
 
@@ -20,6 +21,16 @@ public partial class App : Application
     {
         base.OnStart();
 		
+=======
+	public App()
+	{
+		InitializeComponent();
+	}
+
+    protected override async void OnStart()
+    {
+        base.OnStart();
+>>>>>>> Stashed changes
 		try
 		{
 			await FirestoreDatabase.InitializeAsync();
@@ -28,6 +39,7 @@ public partial class App : Application
 		{
 			Debug.WriteLine("Firestore failed to connect!");
 		}
+<<<<<<< Updated upstream
 
         // await Shell.Current.GoToAsync($"{nameof(SplashPage)}");
 
@@ -52,6 +64,8 @@ public partial class App : Application
             Debug.WriteLine($"Navigation failed: {ex.Message}");
             await Shell.Current.GoToAsync($"{nameof(LoginPage)}");
         }
+=======
+>>>>>>> Stashed changes
     }
 
 	protected override Window CreateWindow(IActivationState? activationState)

@@ -7,8 +7,8 @@
     Title="Leux">
 
     <ShellContent
-        x:Name="loginShell"
-        Route="Login"
-        Shell.NavBarIsVisible="False"
-        ContentTemplate="{DataTemplate local:LoginPage}" />
+        Title="Home"
+        ContentTemplate="{DataTemplate local:LoginPage}"
+        Route="MainPage" />
+
 </Shell>
