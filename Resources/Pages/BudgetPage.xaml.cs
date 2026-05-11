@@ -3,12 +3,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Firebase.Auth;
+using Google.Cloud.Firestore;
 using Leux.Resources.Firestore;
+using Leux.Resources.Models;
+using Leux.Services;
 
-<<<<<<< Updated upstream
 namespace Leux.Resources.Pages
 {
-
     public partial class BudgetPage : ContentPage
     {
         private readonly IBudgetService _budgetService;
@@ -17,7 +19,6 @@ namespace Leux.Resources.Pages
 
         public ObservableCollection<BudgetSummary> BudgetSummaries { get; set; }
 
-        // This constructor matches your latest version
         public BudgetPage(INavigationService navigationService, IBudgetService budgetService, FirebaseAuthClient authClient)
         {
             InitializeComponent();
@@ -29,7 +30,6 @@ namespace Leux.Resources.Pages
             BudgetSummaries = new ObservableCollection<BudgetSummary>();
             BudgetsCollectionView.ItemsSource = BudgetSummaries;
 
-
             CategoryPicker.ItemsSource = new List<string>
             {
                 "All Categories",
@@ -39,7 +39,6 @@ namespace Leux.Resources.Pages
                 "Transport",
                 "Shopping",
                 "Other"
-
             };
             CategoryPicker.SelectedIndex = 0;
         }
@@ -59,47 +58,32 @@ namespace Leux.Resources.Pages
                 return;
             }
 
-
             LoadingSpinner.IsVisible = true;
             BudgetsCollectionView.IsVisible = false;
 
             try
             {
-
-                // 1. Get all summaries from the service
                 var summaries = await _budgetService.GetUserBudgetSummariesAsync(currentUserId);
 
-
-                // 2. Populate the on-screen list
                 BudgetSummaries.Clear();
                 foreach (var summary in summaries.OrderBy(s => s.Name))
                 {
                     BudgetSummaries.Add(summary);
                 }
 
-                // --- *** NEW: BUDGET ALERT LOGIC *** ---
-
-                // 3. Check for any budgets over the 80% threshold
                 var budgetsOverThreshold = summaries
                     .Where(s => s.PercentSpent >= 0.80)
                     .ToList();
 
-                // 4. If any budgets are found, build and show the alert
                 if (budgetsOverThreshold.Any())
                 {
-                    // Construct a list of budget names and their percentages
                     var budgetAlertStrings = budgetsOverThreshold
                         .Select(b => $"{b.Name} ({b.PercentSpent:P0})");
 
                     string budgetList = string.Join(", ", budgetAlertStrings);
-
-                    string title = "Budget Alert";
-                    string message = $"You have reached or exceeded 80% of your limit for the following budgets: {budgetList}.";
-
-                    // Display the alert as requested
-                    await DisplayAlert(title, message, "OK");
+                    await DisplayAlert("Budget Alert",
+                        $"You have reached or exceeded 80% of your limit for: {budgetList}.", "OK");
                 }
-                // --- *** END OF NEW LOGIC *** ---
             }
             catch (Exception ex)
             {
@@ -107,7 +91,6 @@ namespace Leux.Resources.Pages
             }
             finally
             {
-
                 LoadingSpinner.IsVisible = false;
                 BudgetsCollectionView.IsVisible = true;
             }
@@ -119,7 +102,6 @@ namespace Leux.Resources.Pages
             BudgetAmountEntry.Text = string.Empty;
             CategoryPicker.SelectedIndex = 0;
             BudgetDatePicker.Date = DateTime.Today;
-
             PopupOverlay.IsVisible = true;
         }
 
@@ -128,7 +110,6 @@ namespace Leux.Resources.Pages
             PopupOverlay.IsVisible = false;
         }
 
-        // SaveBudget now includes Category
         private async void OnSaveBudgetClicked(object sender, EventArgs e)
         {
             string currentUserId = _authClient?.User?.Uid;
@@ -171,8 +152,6 @@ namespace Leux.Resources.Pages
                 {
                     await DisplayAlert("Success", $"Budget '{name}' saved!", "OK");
                     PopupOverlay.IsVisible = false;
-
-
                     await LoadUserBudgetSummaries();
                 }
                 else
@@ -183,7 +162,6 @@ namespace Leux.Resources.Pages
             catch (Exception ex)
             {
                 await DisplayAlert("Error", $"An unexpected error occurred: {ex.Message}", "OK");
-                Console.WriteLine($"Save Budget Error: {ex.Message}");
             }
         }
 
@@ -199,44 +177,5 @@ namespace Leux.Resources.Pages
                 await DisplayAlert("Error", $"Failed to sign out: {ex.Message}", "OK");
             }
         }
-=======
-namespace Leux;
-
-public partial class BudgetPage : ContentPage
-{
-    public BudgetPage()
-    {
-        InitializeComponent();
-    }
-
-    private void OnAddBudgetClicked(object sender, EventArgs e)
-    {
-        string name = BudgetNameEntry.Text;
-        string amountText = BudgetAmountEntry.Text;
-        DateTime date = BudgetDatePicker.Date;
-
-        BudgetNameLabel.Text = $"Name: {name}";
-        BudgetAmountLabel.Text = $"Amount: {amountText}";
-        BudgetDateLabel.Text = $"Date: {date:MMMM dd, yyyy}";
-
-        BudgetDisplayFrame.IsVisible = true;
-        PopupOverlay.IsVisible = true;
-    }
-
-    private void OnCancelClicked(object sender, EventArgs e)
-    {
-        PopupOverlay.IsVisible = false;
-    }
-
-    private void OnSaveBudgetClicked(object sender, EventArgs e)
-    {
-        string name = BudgetNameEntry.Text;
-        string amountText = BudgetAmountEntry.Text;
-        DateTime date = BudgetDatePicker.Date;
-
-        // TODO: Validate and save budget data
-
-        PopupOverlay.IsVisible = false;
->>>>>>> Stashed changes
     }
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-<<<<<<< Updated upstream
              xmlns:local="clr-namespace:Leux.Resources.Pages"
              x:Class="Leux.Resources.Pages.BudgetPage"
              xmlns:models="clr-namespace:Leux.Resources.Models"
@@ -13,23 +12,23 @@
         <local:NavigationHeader Grid.Row="0" />
 
         <Grid Grid.Row="1" Padding="20" ColumnDefinitions="*,Auto">
-            <Label Text="Budget Management" 
-                   FontSize="24" 
-                   HorizontalOptions="Start" 
-                   VerticalOptions="Center" 
+            <Label Text="Budget Management"
+                   FontSize="24"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center"
                    TextColor="Black" />
             <Button Grid.Column="1"
-                    Text="Add Budget" 
-                    Clicked="OnAddBudgetClicked" 
-                    VerticalOptions="Center" 
-                    HorizontalOptions="End" 
+                    Text="Add Budget"
+                    Clicked="OnAddBudgetClicked"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
                     BackgroundColor="LimeGreen" />
         </Grid>
 
         <Grid Grid.Row="2">
 
             <ActivityIndicator x:Name="LoadingSpinner"
-                               IsRunning="True" 
+                               IsRunning="True"
                                IsVisible="True"
                                VerticalOptions="Center"
                                HorizontalOptions="Center" />
@@ -59,25 +58,25 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
 
-                                <Label Grid.Row="0" Grid.Column="0" 
-                                       Text="{Binding Name}" 
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding Name}"
                                        FontAttributes="Bold"
                                        FontSize="18"
                                        TextColor="{StaticResource Gray900}"/>
 
-                                <Label Grid.Row="0" Grid.Column="1" 
-                                       Text="{Binding CurrentSpent, StringFormat='{0:C}'}" 
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Text="{Binding CurrentSpent, StringFormat='{0:C}'}"
                                        FontAttributes="Bold"
                                        FontSize="22"
-                                       TextColor="#E63946" 
+                                       TextColor="#E63946"
                                        HorizontalOptions="End" />
 
-                                <Label Grid.Row="1" Grid.Column="0" 
-                                       Text="Total spending limit" 
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Text="Total spending limit"
                                        FontSize="14"
                                        TextColor="{StaticResource Gray600}"/>
 
-                                <Label Grid.Row="1" Grid.Column="1" 
+                                <Label Grid.Row="1" Grid.Column="1"
                                        Text="{Binding SpendingLimit, StringFormat='of {0:C}'}"
                                        FontSize="14"
                                        TextColor="{StaticResource Gray600}"
@@ -89,7 +88,7 @@
 
                                 <Label Grid.Row="3" Grid.Column="0"
                                        Text="{Binding PercentSpent, StringFormat='{0:P0} spent'}"
-                                       TextColor="#B5651D" 
+                                       TextColor="#B5651D"
                                        FontSize="14"
                                        FontAttributes="Bold"
                                        VerticalOptions="Center" />
@@ -108,40 +107,11 @@
             </CollectionView>
         </Grid>
 
-
         <ContentView x:Name="PopupOverlay" IsVisible="False"
                      BackgroundColor="#80000000"
                      VerticalOptions="FillAndExpand"
                      HorizontalOptions="FillAndExpand"
                      Grid.RowSpan="3">
-
-=======
-             x:Class="Leux.BudgetPage"
-             Title="Budget Management">
-    <Grid>
-        <StackLayout Padding="20" Spacing="15" BackgroundColor="White">
-            <Label Text="Budget Management" FontSize="24" HorizontalOptions="Start" VerticalOptions="Start" TextColor="Black" />
-            <Button Text="Add Budget" Clicked="OnAddBudgetClicked" VerticalOptions="Start" HorizontalOptions="End" BackgroundColor="LimeGreen" />
-            <Frame x:Name="BudgetDisplayFrame"
-                   IsVisible="False"
-                   BorderColor="Gray"
-                   CornerRadius="8"
-                   Padding="15"
-                   BackgroundColor="DarkGray">
-                <StackLayout>
-                    <Label x:Name="BudgetNameLabel" Text="Name: " FontSize="16" TextColor="Black" />
-                    <Label x:Name="BudgetAmountLabel" Text="Amount: " FontSize="16" TextColor="Black" />
-                    <Label x:Name="BudgetDateLabel" Text="Date: " FontSize="16" TextColor="Black" />
-                </StackLayout>
-            </Frame>
-        </StackLayout>
-        
-        <!-- Popup Overlay-->
-        <ContentView x:Name="PopupOverlay" IsVisible="False"
-                     BackgroundColor="#80000000"
-                     VerticalOptions="FillAndExpand"
-                     HorizontalOptions="FillAndExpand">
->>>>>>> Stashed changes
             <Frame BackgroundColor="White"
                    Padding="20"
                    CornerRadius="10"
@@ -150,16 +120,12 @@
                    WidthRequest="300">
                 <StackLayout Spacing="15">
                     <Label Text="New Budget" FontSize="20" HorizontalOptions="Center" TextColor="Black"/>
-<<<<<<< Updated upstream
                     <Entry x:Name="BudgetNameEntry" Placeholder="Budget Name (e.g. My Food Budget)" TextColor="Black" />
 
-                    <Picker x:Name="CategoryPicker" 
+                    <Picker x:Name="CategoryPicker"
                             Title="Select Category"
                             TextColor="Black" />
 
-=======
-                    <Entry x:Name="BudgetNameEntry" Placeholder="Budget Name" TextColor="Black" />
->>>>>>> Stashed changes
                     <Entry x:Name="BudgetAmountEntry" Placeholder="Amount" Keyboard="Numeric" TextColor="Black" />
                     <DatePicker x:Name="BudgetDatePicker" TextColor="Black" />
                     <Button Text="Save" Clicked="OnSaveBudgetClicked" />

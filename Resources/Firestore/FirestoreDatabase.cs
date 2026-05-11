@@ -10,7 +10,7 @@ namespace Leux.Resources.Firestore
     {
         private static FirestoreDb _db;
         private static bool _isInitialized = false;
-        private static readonly string _projectID = "leux-ed1c0";
+        private static readonly string _projectID = "leux-new";
 
         public static FirestoreDb Database => _db;
         public static bool IsInitialized => _isInitialized;
@@ -19,7 +19,12 @@ namespace Leux.Resources.Firestore
         {
             try
             {
-                GoogleCredential credential = GoogleCredential.FromJson(FirestoreCredentials.Credentials);
+                var stream = await FileSystem.OpenAppPackageFileAsync("leux-new-firebase-adminsdk.json");
+                string json;
+                using (var reader = new StreamReader(stream))
+                    json = await reader.ReadToEndAsync();
+
+                GoogleCredential credential = GoogleCredential.FromJson(json);
                 ChannelCredentials channelCredentials = credential.ToChannelCredentials();
 
                 FirestoreDbBuilder builder = new FirestoreDbBuilder

@@ -29,18 +29,18 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(new FirebaseAuthClient(new FirebaseAuthConfig()
         {
-            ApiKey = "AIzaSyA8dJzxokMX81gk5uU4P9bByaYNGFhGlC0",
-            AuthDomain = "leux-ed1c0.firebaseapp.com",
+            ApiKey = "AIzaSyAZiEAyXWoOlGdbjvdJARVwiwNtSmYiHI4",
+            AuthDomain = "leux-new.firebaseapp.com",
             Providers = new[] { new EmailProvider() }
         }));
 
-        string projectId = "leux-ed1c0";
+        string projectId = "leux-new";
 
         builder.Services.AddSingleton<FirestoreDb>(provider =>
         {
             try
             {
-                var stream = FileSystem.OpenAppPackageFileAsync("leux-ed1c0-firebase-adminsdk-fbsvc-46b4a2c882.json")
+                var stream = FileSystem.OpenAppPackageFileAsync("leux-new-firebase-adminsdk.json")
                     .GetAwaiter().GetResult();
 
                 string json;
@@ -63,8 +63,8 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(new FirebaseAuthClient(new FirebaseAuthConfig()
         {
-            ApiKey = "AIzaSyA8dJzxokMX81gk5uU4P9bByaYNGFhGlC0",
-            AuthDomain = "leux-ed1c0.firebaseapp.com",
+            ApiKey = "AIzaSyAZiEAyXWoOlGdbjvdJARVwiwNtSmYiHI4",
+            AuthDomain = "leux-new.firebaseapp.com",
             Providers = new[] { new EmailProvider() },
             UserRepository = new FileUserRepository("Leux")
         }));
