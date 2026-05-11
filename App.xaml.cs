@@ -1,4 +1,3 @@
-using Leux.Resources.Firestore;
 using Leux.Services;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -18,15 +17,6 @@ public partial class App : Application
     protected override async void OnStart()
     {
         base.OnStart();
-
-		try
-		{
-			await FirestoreDatabase.InitializeAsync();
-		}
-		catch (Exception ex)
-		{
-			Debug.WriteLine("Firestore failed to connect!");
-		}
 
         await Task.Delay(100);
 

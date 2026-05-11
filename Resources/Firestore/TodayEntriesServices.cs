@@ -1,56 +1,84 @@
-﻿using Google.Cloud.Firestore;
+using Firebase.Auth;
+using Leux.Resources.Firestore;
 
-namespace Leux;
-
-public class TodayEntriesService
+namespace Leux
 {
-    public async Task<List<ExpenseItem>> GetTodayAsync(string userId, TimeZoneInfo? tz = null)
+    public class TodayEntriesService
     {
-        if (!Resources.Firestore.FirestoreDatabase.IsInitialized)
-            await Resources.Firestore.FirestoreDatabase.InitializeAsync();
+        private readonly FirebaseAuthClient _auth;
+        private readonly FirestoreRestClient _rest;
 
-        var db = Resources.Firestore.FirestoreDatabase.Database;
-
-        tz ??= TimeZoneInfo.Local;
-        var startLocal = DateTime.Today;
-        var endLocal = startLocal.AddDays(1);
-
-        var startUtc = TimeZoneInfo.ConvertTimeToUtc(startLocal, tz);
-        var endUtc = TimeZoneInfo.ConvertTimeToUtc(endLocal, tz);
-   
-        var q = db.Collection("users").Document(userId).Collection("entries")
-            .WhereGreaterThanOrEqualTo("occurredAt", Timestamp.FromDateTime(DateTime.SpecifyKind(startUtc, DateTimeKind.Utc)))
-            .WhereLessThan("occurredAt", Timestamp.FromDateTime(DateTime.SpecifyKind(endUtc, DateTimeKind.Utc)))
-            .OrderByDescending("occurredAt");
-
-        var snap = await q.GetSnapshotAsync();
-
-        var list = new List<ExpenseItem>();
-        foreach (var doc in snap.Documents)
+        public TodayEntriesService(FirebaseAuthClient auth, FirestoreRestClient rest)
         {
-            var d = doc.ToDictionary();
-
-            list.Add(new ExpenseItem
-            {
-                Id = doc.Id,
-                Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
-                Description = d.TryGetValue("description", out var ds) ? (string)ds : "",
-                Amount = d.TryGetValue("amount", out var a) ? ToDouble(a) : 0d,
-
-                OccurredAt = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts
-                                 ? ts.ToDateTime().ToLocalTime()
-                                 : DateTime.Now
-            });
+            _auth = auth;
+            _rest = rest;
         }
-        return list;
-    }
 
-    private static double ToDouble(object v)
-    {
-        if (v is double d) return d;
-        if (v is long l) return l;
-        if (v is int i) return i;
-        double.TryParse(v?.ToString(), out var x);
-        return x;
+        public async Task<List<ExpenseItem>> GetTodayAsync(string userId, TimeZoneInfo? tz = null)
+        {
+            var token = _auth.User == null ? null : await _auth.User.GetIdTokenAsync(false);
+            if (token == null) return new();
+
+            tz ??= TimeZoneInfo.Local;
+            var startUtc = TimeZoneInfo.ConvertTimeToUtc(DateTime.Today, tz);
+            var endUtc = startUtc.AddDays(1);
+
+            var query = new
+            {
+                from = new[] { new { collectionId = "entries" } },
+                where = new
+                {
+                    compositeFilter = new
+                    {
+                        op = "AND",
+                        filters = new object[]
+                        {
+                            new
+                            {
+                                fieldFilter = new
+                                {
+                                    field = new { fieldPath = "occurredAt" },
+                                    op = "GREATER_THAN_OR_EQUAL",
+                                    value = new { timestampValue = startUtc.ToString("o") }
+                                }
+                            },
+                            new
+                            {
+                                fieldFilter = new
+                                {
+                                    field = new { fieldPath = "occurredAt" },
+                                    op = "LESS_THAN",
+                                    value = new { timestampValue = endUtc.ToString("o") }
+                                }
+                            }
+                        }
+                    }
+                },
+                orderBy = new[] { new { field = new { fieldPath = "occurredAt" }, direction = "DESCENDING" } }
+            };
+
+            var docs = await _rest.RunQueryAsync($"users/{userId}", query, token);
+            return docs.Select(d =>
+            {
+                var f = d.Fields;
+                return new ExpenseItem
+                {
+                    Id = d.Id,
+                    Category = f.TryGetValue("category", out var c) ? (string)c : "Other",
+                    Description = f.TryGetValue("description", out var ds) ? (string)ds : "",
+                    Amount = f.TryGetValue("amount", out var a) ? ToDouble(a) : 0d,
+                    OccurredAt = f.TryGetValue("occurredAt", out var t) && t is DateTime dt
+                        ? dt.ToLocalTime() : DateTime.Now
+                };
+            }).ToList();
+        }
+
+        private static double ToDouble(object v)
+        {
+            if (v is double d) return d;
+            if (v is long l) return l;
+            if (v is int i) return i;
+            return double.TryParse(v?.ToString(), out var x) ? x : 0d;
+        }
     }
 }

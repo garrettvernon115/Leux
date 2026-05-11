@@ -1,48 +1,45 @@
-﻿using Google.Cloud.Firestore;
+using Firebase.Auth;
+using Google.Cloud.Firestore;
 using Leux.Resources.Firestore;
 using Leux.Resources.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics; 
-using System.Linq;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Leux.Services
 {
-    [FirestoreData]
-    internal class UserDocument
-    {
-        
-        [FirestoreProperty("expenses")]
-        public List<ExpenseEntry> Expenses { get; set; }
-
-        [FirestoreProperty("budgets")]
-        public List<Budget> Budgets { get; set; }
-
-        [FirestoreProperty("reports")]
-        public List<ReportData> Reports { get; set; }
-    }
-
     public class BudgetService : IBudgetService
     {
-        private readonly FirestoreDb _firestoreDb = FirestoreDatabase.Database;
-        private readonly CollectionReference _usersCollection;
+        private readonly FirebaseAuthClient _auth;
+        private readonly FirestoreRestClient _rest;
 
-        public BudgetService()
+        public BudgetService(FirebaseAuthClient auth, FirestoreRestClient rest)
         {
-            _usersCollection = _firestoreDb.Collection("users");
+            _auth = auth;
+            _rest = rest;
         }
+
+        private async Task<string?> Token() =>
+            _auth.User == null ? null : await _auth.User.GetIdTokenAsync(false);
 
         public async Task<bool> CreateBudgetAsync(string userId, Budget newBudget)
         {
+            var token = await Token();
+            if (token == null) return false;
             try
             {
                 newBudget.BudgetId = Guid.NewGuid().ToString();
                 newBudget.CreatedAt = Timestamp.GetCurrentTimestamp();
-
-                DocumentReference userDocRef = _usersCollection.Document(userId);
-                await userDocRef.UpdateAsync("budgets", FieldValue.ArrayUnion(newBudget));
-                return true;
+                var map = new Dictionary<string, object?>
+                {
+                    ["budgetId"] = newBudget.BudgetId,
+                    ["name"] = newBudget.Name,
+                    ["category"] = newBudget.Category ?? "",
+                    ["spendingLimit"] = newBudget.SpendingLimit,
+                    ["timePeriod"] = newBudget.TimePeriod ?? "",
+                    ["startDate"] = newBudget.StartDate.ToDateTime(),
+                    ["endDate"] = newBudget.EndDate.ToDateTime(),
+                    ["createdAt"] = newBudget.CreatedAt.ToDateTime()
+                };
+                return await _rest.ArrayUnionAsync($"users/{userId}", "budgets", map, token);
             }
             catch (Exception ex)
             {
@@ -53,98 +50,84 @@ namespace Leux.Services
 
         public async Task<List<Budget>> GetUserBudgetsAsync(string userId)
         {
+            var token = await Token();
+            if (token == null) return new();
             try
             {
-                DocumentReference userDocRef = _usersCollection.Document(userId);
-                DocumentSnapshot snapshot = await userDocRef.GetSnapshotAsync();
-                if (snapshot.Exists)
-                {
-                    var userDoc = snapshot.ConvertTo<UserDocument>();
-                    return userDoc?.Budgets ?? new List<Budget>();
-                }
-                return new List<Budget>();
+                var doc = await _rest.GetDocumentAsync($"users/{userId}", token);
+                if (doc == null || !doc.TryGetValue("budgets", out var raw)) return new();
+                var list = (List<object>)raw;
+                return list.Select(b => ParseBudget((Dictionary<string, object>)b)).ToList();
             }
-            catch
-            {
-                return new List<Budget>();
-            }
+            catch { return new(); }
         }
 
-        
         public async Task<List<ExpenseEntry>> GetUserExpensesAsync(string userId)
         {
-            var expenses = new List<ExpenseEntry>();
+            var token = await Token();
+            if (token == null) return new();
             try
             {
-               
-                CollectionReference entriesCol = _usersCollection.Document(userId).Collection("entries");
-                QuerySnapshot snapshot = await entriesCol.GetSnapshotAsync();
-
-                
-                foreach (DocumentSnapshot doc in snapshot.Documents)
-                {
-                    var d = doc.ToDictionary();
-                    var entry = new ExpenseEntry
-                    {
-                        
-                        Name = d.TryGetValue("description", out var ds) ? (string)ds : "",
-                        Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
-                        Cost = ToDouble(d.TryGetValue("amount", out var a) ? a : 0d),
-                        Date = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts ? ts : Timestamp.FromDateTime(DateTime.UtcNow)
-                    };
-                    expenses.Add(entry);
-                }
-                return expenses;
+                var docs = await _rest.ListDocumentsAsync($"users/{userId}/entries", token);
+                return docs.Select(d => ParseExpense(d.Fields)).ToList();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error in BudgetService.GetUserExpensesAsync: {ex.Message}");
-                return expenses; 
+                return new();
             }
         }
 
         public async Task<List<BudgetSummary>> GetUserBudgetSummariesAsync(string userId)
         {
-            Task<List<ExpenseEntry>> expensesTask = GetUserExpensesAsync(userId);
-            Task<List<Budget>> budgetsTask = GetUserBudgetsAsync(userId);
-
-            await Task.WhenAll(expensesTask, budgetsTask);
-
-            List<ExpenseEntry> allExpenses = await expensesTask;
-            List<Budget> allBudgets = await budgetsTask;
-
-            var budgetSummaries = new List<BudgetSummary>();
-
-            
-            foreach (var budget in allBudgets)
+            var expenses = await GetUserExpensesAsync(userId);
+            var budgets = await GetUserBudgetsAsync(userId);
+            var summaries = new List<BudgetSummary>();
+            foreach (var budget in budgets)
             {
-               
-                var expensesInTimeframe = allExpenses.Where(e =>
-                    e.Date >= budget.StartDate && e.Date <= budget.EndDate
-                );
-
-             
+                var inRange = expenses.Where(e => e.Date >= budget.StartDate && e.Date <= budget.EndDate);
                 if (!string.IsNullOrEmpty(budget.Category))
-                {
-                    expensesInTimeframe = expensesInTimeframe.Where(e =>
-                        e.Category == budget.Category
-                    );
-                }
-
-                
-                double currentSpent = expensesInTimeframe.Sum(e => e.Cost);
-
-                budgetSummaries.Add(new BudgetSummary
+                    inRange = inRange.Where(e => e.Category == budget.Category);
+                summaries.Add(new BudgetSummary
                 {
                     Name = budget.Name,
                     SpendingLimit = budget.SpendingLimit,
-                    CurrentSpent = currentSpent
+                    CurrentSpent = inRange.Sum(e => e.Cost)
                 });
             }
-
-            return budgetSummaries;
+            return summaries;
         }
 
+        private static Budget ParseBudget(Dictionary<string, object> m)
+        {
+            static Timestamp ToTs(object v) =>
+                Timestamp.FromDateTime(DateTime.SpecifyKind((DateTime)v, DateTimeKind.Utc));
+            return new Budget
+            {
+                BudgetId = m.TryGetValue("budgetId", out var id) ? (string)id : "",
+                Name = m.TryGetValue("name", out var n) ? (string)n : "",
+                Category = m.TryGetValue("category", out var c) ? (string)c : "",
+                SpendingLimit = m.TryGetValue("spendingLimit", out var sl) ? ToDouble(sl) : 0d,
+                TimePeriod = m.TryGetValue("timePeriod", out var tp) ? (string)tp : "",
+                StartDate = m.TryGetValue("startDate", out var sd) && sd is DateTime sdt ? ToTs(sdt) : default,
+                EndDate = m.TryGetValue("endDate", out var ed) && ed is DateTime edt ? ToTs(edt) : default,
+                CreatedAt = m.TryGetValue("createdAt", out var ca) && ca is DateTime cadt ? ToTs(cadt) : default,
+            };
+        }
+
+        internal static ExpenseEntry ParseExpense(Dictionary<string, object> d)
+        {
+            static Timestamp ToTs(DateTime dt) =>
+                Timestamp.FromDateTime(DateTime.SpecifyKind(dt, DateTimeKind.Utc));
+            return new ExpenseEntry
+            {
+                Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
+                Name = d.TryGetValue("description", out var ds) ? (string)ds : "",
+                Cost = d.TryGetValue("amount", out var a) ? ToDouble(a) : 0d,
+                Date = d.TryGetValue("occurredAt", out var t) && t is DateTime dt
+                    ? ToTs(dt) : Timestamp.FromDateTime(DateTime.UtcNow)
+            };
+        }
 
         private static double ToDouble(object v)
         {

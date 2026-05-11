@@ -2,6 +2,7 @@
 using Firebase.Auth.Providers;
 using Firebase.Auth.Repository;
 using Google.Cloud.Firestore;
+using Leux.Resources.Firestore;
 using Leux.Resources.Firestore.Example;
 using Leux.Resources.Models;
 using Leux.Resources.Pages;
@@ -68,6 +69,9 @@ public static class MauiProgram
             Providers = new[] { new EmailProvider() },
             UserRepository = new FileUserRepository("Leux")
         }));
+
+        builder.Services.AddSingleton<HttpClient>();
+        builder.Services.AddSingleton<FirestoreRestClient>();
 
         builder.Services.AddSingleton<IUserService, UserService>();
 
