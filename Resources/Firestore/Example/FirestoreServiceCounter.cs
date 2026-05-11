@@ -1,51 +1,38 @@
-﻿using Google.Apis.Auth.OAuth2;
+using Firebase.Auth;
 using Google.Cloud.Firestore;
-using Grpc.Auth;
-using Grpc.Core;
-using Leux.Resources.Firestore;
 using Leux.Resources.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Leux.Resources.Firestore.Example
 {
     public class FirestoreServiceCounter : IFireStoreServiceCounter
     {
-        
-        private const string CollectionName = "app_data";
-        private const string DocumentID = "counter";
-        private bool _isInitialized = false;
+        private const string Path = "app_data/counter";
+        private readonly FirebaseAuthClient _auth;
+        private readonly FirestoreRestClient _rest;
 
-        public bool IsInitialized => _isInitialized;
+        public FirestoreServiceCounter(FirebaseAuthClient auth, FirestoreRestClient rest)
+        {
+            _auth = auth;
+            _rest = rest;
+        }
+
+        private async Task<string?> Token() =>
+            _auth.User == null ? null : await _auth.User.GetIdTokenAsync(false);
 
         public async Task<CounterData> GetCounterAsync()
         {
+            var token = await Token();
+            if (token == null) return new CounterData();
             try
             {
-                if (!FirestoreDatabase.IsInitialized)
-                {
-                    Debug.WriteLine("Firestore not initialized");
-                    return new CounterData();
-                }
-
-                DocumentReference docRef = FirestoreDatabase.Database.Collection(CollectionName).Document(DocumentID);
-                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
-
-                if (snapshot.Exists)
-                {
-                    CounterData counterData = snapshot.ConvertTo<CounterData>();
-                    return counterData ?? new CounterData();
-                }
-                else
-                {
-                    var initialData = new CounterData();
-                    await docRef.SetAsync(initialData);
-                    return initialData;
-                }
+                var doc = await _rest.GetDocumentAsync(Path, token);
+                if (doc == null) return new CounterData();
+                int count = doc.TryGetValue("count", out var c) ? (int)ToLong(c) : 0;
+                var lastUpdated = doc.TryGetValue("lastUpdated", out var lu) && lu is DateTime dt
+                    ? Timestamp.FromDateTime(DateTime.SpecifyKind(dt, DateTimeKind.Utc))
+                    : Timestamp.GetCurrentTimestamp();
+                return new CounterData(count) { LastUpdated = lastUpdated };
             }
             catch (Exception ex)
             {
@@ -56,69 +43,24 @@ namespace Leux.Resources.Firestore.Example
 
         public async Task<bool> UpdateCounterAsync(int count)
         {
-            try
+            var token = await Token();
+            if (token == null) return false;
+            return await _rest.SetDocumentAsync(Path, new Dictionary<string, object?>
             {
-                if (!FirestoreDatabase.IsInitialized)
-                {
-                    Debug.WriteLine("Firestore not initialized");
-                    return false;
-                }
-
-                DocumentReference docRef = FirestoreDatabase.Database.Collection(CollectionName).Document(DocumentID);
-
-                await FirestoreDatabase.Database.RunTransactionAsync(async transaction =>
-                {
-                    DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(docRef);
-                    int currentCount = 0;
-                    if (snapshot.Exists)
-                    {
-                        var data = snapshot.ConvertTo<CounterData>();
-                        currentCount = data?.Count ?? 0;
-                    }
-
-                    var updateData = new CounterData(currentCount + 1);
-                    transaction.Set(docRef, updateData);
-                });
-
-                Debug.WriteLine("Counter incremented successfully");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error getting counter: {ex.Message}");
-                throw;
-            }
+                ["count"] = count,
+                ["lastUpdated"] = DateTime.UtcNow
+            }, token);
         }
 
         public async Task<bool> IncrementCounterAsync()
         {
+            var token = await Token();
+            if (token == null) return false;
             try
             {
-                if (!FirestoreDatabase.IsInitialized)
-                {
-                    Debug.WriteLine("Firestore not initialized");
-                    return false;
-                }
-
-                DocumentReference docRef = FirestoreDatabase.Database.Collection(CollectionName).Document(DocumentID);
-
-                await FirestoreDatabase.Database.RunTransactionAsync(async transaction =>
-                {
-                    DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(docRef);
-
-                    int currentCount = 0;
-                    if (snapshot.Exists)
-                    {
-                        var data = snapshot.ConvertTo<CounterData>();
-                        currentCount = data?.Count ?? 0;
-                    }
-
-                    var updatedData = new CounterData(currentCount + 1);
-                    transaction.Set(docRef, updatedData);
-                });
-
-                Debug.WriteLine("Counter incremented successfully");
-                return true;
+                var doc = await _rest.GetDocumentAsync(Path, token);
+                int current = doc != null && doc.TryGetValue("count", out var c) ? (int)ToLong(c) : 0;
+                return await UpdateCounterAsync(current + 1);
             }
             catch (Exception ex)
             {
@@ -127,9 +69,14 @@ namespace Leux.Resources.Firestore.Example
             }
         }
 
-        public async Task<bool> ResetCounterAsync()
+        public async Task<bool> ResetCounterAsync() => await UpdateCounterAsync(0);
+
+        private static long ToLong(object v)
         {
-            return await UpdateCounterAsync(0);
+            if (v is long l) return l;
+            if (v is int i) return i;
+            if (v is double d) return (long)d;
+            return long.TryParse(v?.ToString(), out var x) ? x : 0L;
         }
     }
 }

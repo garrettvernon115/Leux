@@ -1,41 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Firebase.Auth;
 using Google.Cloud.Firestore;
-using Leux.Resources.Models;
 using Leux.Resources.Firestore;
+using Leux.Resources.Models;
 using System.Diagnostics;
 
 namespace Leux.Services
 {
     public class DashboardService : IDashboardService
     {
-        private readonly FirestoreDb _firestoreDb = FirestoreDatabase.Database;
-        private readonly CollectionReference _usersCollection;
+        private readonly FirebaseAuthClient _auth;
+        private readonly FirestoreRestClient _rest;
 
-        public DashboardService()
+        public DashboardService(FirebaseAuthClient auth, FirestoreRestClient rest)
         {
-            _usersCollection = _firestoreDb.Collection("users");
+            _auth = auth;
+            _rest = rest;
         }
+
+        private async Task<string?> Token() =>
+            _auth.User == null ? null : await _auth.User.GetIdTokenAsync(false);
 
         public async Task<bool> AddExpenseAsync(string userId, ExpenseEntry newExpense)
         {
+            var token = await Token();
+            if (token == null) return false;
             try
             {
-                CollectionReference entriesCol = _usersCollection.Document(userId).Collection("entries");
-
-                var expenseData = new Dictionary<string, object>
+                return await _rest.AddDocumentAsync($"users/{userId}/entries", new Dictionary<string, object?>
                 {
-                    { "description", newExpense.Name },
-                    { "category", newExpense.Category },
-                    { "amount", newExpense.Cost },
-                    { "occurredAt", newExpense.Date }
-                };
-
-                await entriesCol.AddAsync(expenseData);
-                return true;
+                    ["description"] = newExpense.Name,
+                    ["category"] = newExpense.Category,
+                    ["amount"] = newExpense.Cost,
+                    ["occurredAt"] = newExpense.Date.ToDateTime()
+                }, token);
             }
             catch (Exception ex)
             {
@@ -46,30 +43,32 @@ namespace Leux.Services
 
         public async Task<List<ExpenseEntry>> GetUserExpensesAsync(string userId)
         {
-            var expenses = new List<ExpenseEntry>();
+            var token = await Token();
+            if (token == null) return new();
             try
             {
-                CollectionReference entriesCol = _usersCollection.Document(userId).Collection("entries");
-                QuerySnapshot snapshot = await entriesCol.GetSnapshotAsync();
-
-                foreach (DocumentSnapshot doc in snapshot.Documents)
-                {
-                    var d = doc.ToDictionary();
-                    var entry = new ExpenseEntry
-                    {
-                        Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
-                        Name = d.TryGetValue("description", out var ds) ? (string)ds : "",
-                        Cost = ToDouble(d.TryGetValue("amount", out var a) ? a : 0d),
-                        Date = d.TryGetValue("occurredAt", out var t) && t is Timestamp ts ? ts : Timestamp.FromDateTime(DateTime.UtcNow)
-                    };
-                    expenses.Add(entry);
-                }
+                var docs = await _rest.ListDocumentsAsync($"users/{userId}/entries", token);
+                return docs.Select(d => ParseExpense(d.Fields)).ToList();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error in GetUserExpensesAsync: {ex.Message}");
+                return new();
             }
-            return expenses;
+        }
+
+        private static ExpenseEntry ParseExpense(Dictionary<string, object> d)
+        {
+            static Timestamp ToTs(DateTime dt) =>
+                Timestamp.FromDateTime(DateTime.SpecifyKind(dt, DateTimeKind.Utc));
+            return new ExpenseEntry
+            {
+                Category = d.TryGetValue("category", out var c) ? (string)c : "Other",
+                Name = d.TryGetValue("description", out var ds) ? (string)ds : "",
+                Cost = d.TryGetValue("amount", out var a) ? ToDouble(a) : 0d,
+                Date = d.TryGetValue("occurredAt", out var t) && t is DateTime dt
+                    ? ToTs(dt) : Timestamp.FromDateTime(DateTime.UtcNow)
+            };
         }
 
         private static double ToDouble(object v)

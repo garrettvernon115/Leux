@@ -1,5 +1,4 @@
 ﻿using Firebase.Auth;
-using Google.Cloud.Firestore;
 using Leux.Resources.Firestore;
 using Leux.Resources.Models;
 using System.Threading.Tasks;
@@ -9,14 +8,16 @@ namespace Leux.Services
     public class UserService : IUserService
     {
         private readonly FirebaseAuthClient _authClient;
+        private readonly FirestoreRestClient _rest;
         private const string AUTH_TOKEN_KEY = "auth_token";
         private const string USER_ID_KEY = "user_id";
 
         public FirebaseAuthClient AuthClient => _authClient;
 
-        public UserService(FirebaseAuthClient authClient)
+        public UserService(FirebaseAuthClient authClient, FirestoreRestClient rest)
         {
             _authClient = authClient;
+            _rest = rest;
         }
 
         public async Task<bool> RegisterUserAsync(string username, string email, string password)
@@ -25,16 +26,14 @@ namespace Leux.Services
             {
                 var authCredential = await _authClient.CreateUserWithEmailAndPasswordAsync(email, password, username);
                 string userId = authCredential.User.Uid;
+                string token = await authCredential.User.GetIdTokenAsync(false);
 
-                var user = new Leux.Resources.Models.User
+                await _rest.SetDocumentAsync($"users/{userId}", new Dictionary<string, object?>
                 {
-                    UserId = userId,
-                    Email = email,
-                    Username = username
-                };
-
-                CollectionReference usersCollection = FirestoreDatabase.Database.Collection("users");
-                await usersCollection.Document(userId).SetAsync(user);
+                    ["userId"] = userId,
+                    ["email"] = email,
+                    ["username"] = username
+                }, token);
                 return true;
             }
             catch (FirebaseAuthException)

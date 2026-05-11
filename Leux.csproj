@@ -57,10 +57,7 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="Resources\Firestore\leux-new-firebase-adminsdk.json" />
+		<MauiAsset Remove="Resources\Raw\*firebase*.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -71,9 +68,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiAsset Update="Resources\Raw\leux-new-firebase-adminsdk.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </MauiAsset>
 	  <Compile Update="Resources\Pages\BudgetPage.xaml.cs">
 	    <DependentUpon>BudgetPage.xaml</DependentUpon>
 	  </Compile>
