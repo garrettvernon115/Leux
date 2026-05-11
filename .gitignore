@@ -626,3 +626,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Firebase service account keys
+*firebase-adminsdk*.json
+Resources/Raw/*firebase*.json

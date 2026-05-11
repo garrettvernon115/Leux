@@ -60,7 +60,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\Firestore\leux-ed1c0-firebase-adminsdk-fbsvc-46b4a2c882.json" />
+	  <None Remove="Resources\Firestore\leux-new-firebase-adminsdk.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -71,7 +71,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiAsset Update="Resources\Raw\leux-ed1c0-firebase-adminsdk-fbsvc-46b4a2c882.json">
+	  <MauiAsset Update="Resources\Raw\leux-new-firebase-adminsdk.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </MauiAsset>
 	  <Compile Update="Resources\Pages\BudgetPage.xaml.cs">
